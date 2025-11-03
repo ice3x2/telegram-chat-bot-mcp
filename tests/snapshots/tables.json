@@ -1,0 +1,26 @@
+[
+  {
+    "cardId": "md-card-0",
+    "card": {
+      "sections": [
+        {
+          "widgets": [
+            {
+              "textParagraph": {
+                "text": "\n<b>## Data Table</b>\n"
+              }
+            },
+            {
+              "textParagraph": {
+                "text": "```\nName    | Age  | City   \n--------+------+--------\nAlice   | 30   | Seoul  \nBob     | 25   | Busan  \nCharlie | 35   | Incheon\n```"
+              }
+            }
+          ]
+        }
+      ],
+      "header": {
+        "title": "Table Test"
+      }
+    }
+  }
+]

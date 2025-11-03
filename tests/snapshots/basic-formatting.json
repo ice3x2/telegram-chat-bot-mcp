@@ -1,0 +1,31 @@
+[
+  {
+    "cardId": "md-card-0",
+    "card": {
+      "sections": [
+        {
+          "widgets": [
+            {
+              "textParagraph": {
+                "text": "\n<b># Heading 1</b>\n"
+              }
+            },
+            {
+              "textParagraph": {
+                "text": "This is a paragraph with <b>bold</b> text and <i>italic</i> text."
+              }
+            },
+            {
+              "textParagraph": {
+                "text": "Here is some <code>inline code</code> and a <a href=\"https://example.com\">link</a>."
+              }
+            }
+          ]
+        }
+      ],
+      "header": {
+        "title": "Basic Formatting Test"
+      }
+    }
+  }
+]

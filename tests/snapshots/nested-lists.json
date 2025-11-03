@@ -1,0 +1,36 @@
+[
+  {
+    "cardId": "md-card-0",
+    "card": {
+      "sections": [
+        {
+          "widgets": [
+            {
+              "textParagraph": {
+                "text": "\n<b>## Task List</b>\n"
+              }
+            },
+            {
+              "textParagraph": {
+                "text": "• Top level item 1\n• Top level item 2\n  ◦ Nested item 2.1\n  ◦ Nested item 2.2\n    ◦ Deep nested 2.2.1\n• Top level item 3"
+              }
+            },
+            {
+              "textParagraph": {
+                "text": "\n<b>### Ordered List</b>\n"
+              }
+            },
+            {
+              "textParagraph": {
+                "text": "1. First item\n2. Second item\n3. Third item"
+              }
+            }
+          ]
+        }
+      ],
+      "header": {
+        "title": "Nested Lists"
+      }
+    }
+  }
+]

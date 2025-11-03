@@ -1,0 +1,41 @@
+[
+  {
+    "cardId": "md-card-0",
+    "card": {
+      "sections": [
+        {
+          "widgets": [
+            {
+              "textParagraph": {
+                "text": "\n<b>## Code Examples</b>\n"
+              }
+            },
+            {
+              "textParagraph": {
+                "text": "JavaScript:"
+              }
+            },
+            {
+              "textParagraph": {
+                "text": "```javascript\nfunction hello() {\n  console.log('Hello World');\n}\n```"
+              }
+            },
+            {
+              "textParagraph": {
+                "text": "Python:"
+              }
+            },
+            {
+              "textParagraph": {
+                "text": "```python\ndef greet(name):\n    print(f\"Hello {name}\")\n```"
+              }
+            }
+          ]
+        }
+      ],
+      "header": {
+        "title": "Code Blocks"
+      }
+    }
+  }
+]

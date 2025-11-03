@@ -1,0 +1,41 @@
+[
+  {
+    "cardId": "md-card-0",
+    "card": {
+      "sections": [
+        {
+          "widgets": [
+            {
+              "textParagraph": {
+                "text": "\n<b>## Broken Images</b>\n"
+              }
+            },
+            {
+              "textParagraph": {
+                "text": "This image does not exist:\n"
+              }
+            },
+            {
+              "textParagraph": {
+                "text": "[이미지 로드 실패: Broken] <a href=\"https://example.com/nonexistent.jpg\">https://example.com/nonexistent.jpg</a>\n❌ HTTP 404: Not Found"
+              }
+            },
+            {
+              "textParagraph": {
+                "text": "This is not an image:\n"
+              }
+            },
+            {
+              "textParagraph": {
+                "text": "[이미지 로드 실패: Not Image] <a href=\"https://www.google.com\">https://www.google.com</a>\n❌ Invalid content type: text/html; charset=ISO-8859-1 (expected image/*)"
+              }
+            }
+          ]
+        }
+      ],
+      "header": {
+        "title": "Invalid Images"
+      }
+    }
+  }
+]

@@ -1,0 +1,61 @@
+[
+  {
+    "cardId": "md-card-0",
+    "card": {
+      "sections": [
+        {
+          "widgets": [
+            {
+              "textParagraph": {
+                "text": "\n<b># Project Overview</b>\n"
+              }
+            },
+            {
+              "textParagraph": {
+                "text": "\n<b>## Description</b>\n"
+              }
+            },
+            {
+              "textParagraph": {
+                "text": "This is a <b>comprehensive</b> test with <i>multiple</i> elements."
+              }
+            },
+            {
+              "textParagraph": {
+                "text": "\n<b>### Features</b>\n"
+              }
+            },
+            {
+              "textParagraph": {
+                "text": "• Feature 1: <code>code inline</code>\n• Feature 2: <a href=\"https://docs.example.com\">Documentation</a>\n  ◦ Sub-feature A\n  ◦ Sub-feature B"
+              }
+            },
+            {
+              "textParagraph": {
+                "text": "\n<b>### Code Sample</b>\n"
+              }
+            },
+            {
+              "textParagraph": {
+                "text": "```typescript\ninterface User {\n  name: string;\n  age: number;\n}\n```"
+              }
+            },
+            {
+              "textParagraph": {
+                "text": "\n<b>### Data</b>\n"
+              }
+            },
+            {
+              "textParagraph": {
+                "text": "```\nID   | Name   | Status        \n-----+--------+---------------\n1    | Task A | ✅ Done        \n2    | Task B | 🔄 In Progress\n```"
+              }
+            }
+          ]
+        }
+      ],
+      "header": {
+        "title": "Mixed Content"
+      }
+    }
+  }
+]

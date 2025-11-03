@@ -1,0 +1,36 @@
+[
+  {
+    "cardId": "md-card-0",
+    "card": {
+      "sections": [
+        {
+          "widgets": [
+            {
+              "textParagraph": {
+                "text": "\n<b>## Special Characters</b>\n"
+              }
+            },
+            {
+              "textParagraph": {
+                "text": "Text with <html> tags and & ampersands."
+              }
+            },
+            {
+              "textParagraph": {
+                "text": "Code: <code>test</code>"
+              }
+            },
+            {
+              "textParagraph": {
+                "text": "Link: <a href=\"https://example.com?a=1&b=2\">Test & Go</a>"
+              }
+            }
+          ]
+        }
+      ],
+      "header": {
+        "title": "Special Characters"
+      }
+    }
+  }
+]

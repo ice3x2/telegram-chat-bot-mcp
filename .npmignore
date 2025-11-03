@@ -1,0 +1,38 @@
+# Source files
+src/
+tests/
+scripts/
+
+# Configuration files
+tsconfig.json
+eslint.config.mjs
+.eslintrc.*
+
+# Environment and IDE
+.env
+.env.*
+.vscode/
+.idea/
+
+# Git
+.git/
+.gitignore
+.github/
+
+# Logs
+logs/
+*.log
+
+# Dependencies
+node_modules/
+
+# Test files
+*.test.ts
+*.spec.ts
+**/__tests__/
+
+# Documentation (keep only essential ones)
+docs/
+!README.md
+!LICENSE
+!CHANGELOG.md

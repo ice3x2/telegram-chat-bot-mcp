@@ -1,0 +1,21 @@
+[
+  {
+    "cardId": "md-card-0",
+    "card": {
+      "sections": [
+        {
+          "widgets": [
+            {
+              "textParagraph": {
+                "text": "\n<b># Title Only</b>\n"
+              }
+            }
+          ]
+        }
+      ],
+      "header": {
+        "title": "Minimal"
+      }
+    }
+  }
+]

@@ -1,0 +1,51 @@
+[
+  {
+    "cardId": "md-card-0",
+    "card": {
+      "sections": [
+        {
+          "widgets": [
+            {
+              "textParagraph": {
+                "text": "\n<b># 한글 제목</b>\n"
+              }
+            },
+            {
+              "textParagraph": {
+                "text": "\n<b>## 설명</b>\n"
+              }
+            },
+            {
+              "textParagraph": {
+                "text": "이것은 <b>한글</b> 테스트입니다. <i>기울임</i>도 잘 작동합니다."
+              }
+            },
+            {
+              "textParagraph": {
+                "text": "\n<b>### 목록</b>\n"
+              }
+            },
+            {
+              "textParagraph": {
+                "text": "• 첫 번째 항목\n• 두 번째 항목\n  ◦ 중첩된 항목\n• 세 번째 항목"
+              }
+            },
+            {
+              "textParagraph": {
+                "text": "\n<b>### 코드</b>\n"
+              }
+            },
+            {
+              "textParagraph": {
+                "text": "```javascript\n// 한글 주석\nconsole.log('안녕하세요');\n```"
+              }
+            }
+          ]
+        }
+      ],
+      "header": {
+        "title": "한글 테스트"
+      }
+    }
+  }
+]

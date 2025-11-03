@@ -34,7 +34,7 @@ export TELEGRAM_CHAT_ID="your_chat_id"
 
 ## Installation
 
-### Using npm (Recommended)
+### Using npm
 
 Install the `telegram-bot-mcp` package globally or locally:
 
@@ -470,7 +470,7 @@ Telegram Bot MCP 서버는 Telegram Bot API를 통해 메시지를 전송하는 
 
 ## 설치
 
-### npm (권장)
+### npm 
 
 ```bash
 npm install -g telegram-bot-mcp

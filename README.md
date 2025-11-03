@@ -476,15 +476,6 @@ Telegram Bot MCP 서버는 Telegram Bot API를 통해 메시지를 전송하는 
 npm install -g telegram-bot-mcp
 ```
 
-### 소스에서 빌드 (개발용)
-
-```bash
-git clone https://github.com/yourusername/telegram-bot-mcp.git
-cd telegram-bot-mcp
-npm install
-npm run build
-```
-
 ## Telegram 봇 설정
 
 ### 1) Bot 생성 (@BotFather)
@@ -511,8 +502,7 @@ npm run build
 {
   "mcpServers": {
     "telegram-bot": {
-      "command": "npx",
-      "args": ["-y", "telegram-bot-mcp"],
+      "command": "telegram-bot-mcp",
       "env": {
         "TELEGRAM_BOT_TOKEN": "<YOUR_BOT_TOKEN>",
         "TELEGRAM_CHAT_ID": "<YOUR_CHAT_ID>"
@@ -530,8 +520,7 @@ npm run build
 {
   "github.copilot.chat.mcp.servers": {
     "telegram-bot": {
-      "command": "npx",
-      "args": ["-y", "telegram-bot-mcp"],
+      "command": "telegram-bot-mcp",
       "env": {
         "TELEGRAM_BOT_TOKEN": "<YOUR_BOT_TOKEN>",
         "TELEGRAM_CHAT_ID": "<YOUR_CHAT_ID>"

@@ -16,14 +16,6 @@ An MCP (Model Context Protocol) server for sending messages via Telegram Bot API
 - ⌨️ **Inline Keyboards (Buttons)**: Supports various button types including URL, callback_data, etc.
 - 🖼️ **Photo Sending**: Send photos with captions (multiple resolutions) support
 
-## Installation
-
-### npm
-
-```bash
-npm install -g telegram-chat-bot-mcp
-```
-
 ## Telegram Bot Setup
 
 ### 1) Create Bot (@BotFather)
@@ -221,11 +213,6 @@ Telegram Bot MCP 서버는 Telegram Bot API를 통해 메시지를 전송하는 
 
 ## 설치
 
-### npm 
-
-```bash
-npm install -g telegram-bot-mcp
-```
 
 ## Telegram 봇 설정
 

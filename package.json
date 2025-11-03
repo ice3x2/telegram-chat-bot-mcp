@@ -1,5 +1,5 @@
 {
-  "name": "telegram-bot-mcp",
+  "name": "@snoworca/telegram-bot-mcp",
   "version": "0.1.0",
   "description": "MCP server for Telegram Bot API with Markdown support",
   "type": "module",

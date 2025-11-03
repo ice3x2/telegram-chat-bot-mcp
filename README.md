@@ -1,119 +1,56 @@
 ﻿# Telegram Bot MCP Server
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![npm version](https://img.shields.io/npm/v/telegram-bot-mcp.svg)](https://www.npmjs.com/package/telegram-bot-mcp)
+[![npm version](https://img.shields.io/npm/v/telegram-chat-bot-mcp.svg)](https://www.npmjs.com/package/telegram-chat-bot-mcp)
 
-An MCP (Model Context Protocol) server that enables Claude Code, GitHub Copilot, and other MCP clients to send messages to Telegram. Automatically converts Markdown to Telegram HTML format with image validation, structured logging, and fallback handling.
+An MCP (Model Context Protocol) server for sending messages via Telegram Bot API.
 
-## Quick Start
+## Key Features
 
-```bash
-# 1. Install globally
-npm install -g telegram-bot-mcp
-
-# 2. Set environment variables
-export TELEGRAM_BOT_TOKEN="your_token_from_botfather"
-export TELEGRAM_CHAT_ID="your_chat_id"
-
-# 3. Configure your MCP client (Claude Code / GitHub Copilot)
-# See MCP Client Configuration section below
-
-# 4. Start using! Ask Claude or Copilot to send a message to Telegram
-```
-
-## Features
-
-- 🤖 **Telegram Bot API Integration**: Send messages directly to Telegram chats via npm package
-- 📝 **Markdown → HTML Auto-conversion**: Supports headers, lists, code blocks, tables, images
-- 🖼️ **Image URL Validation**: Validates images before sending (HTTP status, Content-Type, size)
-- 🔄 **Auto Fallback**: Automatically falls back to plaintext when HTML parsing fails
-- 📊 **Structured Logging**: JSON format with 30-day retention
-- 🚀 **MCP Protocol Support**: Works with Claude Code, GitHub Copilot, and other MCP clients
-- ⌨️ **Inline Keyboards**: Send interactive buttons with callback data or URLs
-- 🖼️ **Photo Sending**: Send images with captions and formatting
+- 🤖 **Telegram Bot API Integration**: Send messages directly to Telegram chats (personal/group)
+- 📝 **Simple Markdown → HTML Auto-conversion**: Supports headers, lists, code blocks, tables (monospace), images, etc.
+- 🖼️ **Image URL Validation**: Pre-validates HTTP status, Content-Type, file size, etc.
+- 🔄 **Auto Fallback**: Automatically falls back to plaintext when HTML parsing/sending fails
+- 📊 **Structured Logging**: JSON format logs with default 30-day retention policy
+- 🚀 **MCP Protocol Support**: Integrates with Claude Code, GitHub Copilot, and other MCP clients
+- ⌨️ **Inline Keyboards (Buttons)**: Supports various button types including URL, callback_data, etc.
+- 🖼️ **Photo Sending**: Send photos with captions (multiple resolutions) support
 
 ## Installation
 
-### Using npm
-
-Install the `telegram-bot-mcp` package globally or locally:
+### npm
 
 ```bash
-# Global installation (recommended for MCP usage)
-npm install -g telegram-bot-mcp
-
-# Or local installation
-npm install telegram-bot-mcp
-```
-
-### From Source (Development)
-
-If you want to modify the source code:
-
-```bash
-git clone https://github.com/ice3x2/telegram-chat-bot-mcp.git
-cd telegram-chat-bot-mcp
-npm install
-npm run build
-npm run dev  # or 'node dist/index.js' to run
+npm install -g telegram-chat-bot-mcp
 ```
 
 ## Telegram Bot Setup
 
-Before configuring the MCP server, you need to create a Telegram Bot and get your credentials:
+### 1) Create Bot (@BotFather)
 
-### 1. Create a Telegram Bot
+1. Search for **@BotFather** in Telegram.
+2. Send the `/newbot` command and follow the instructions.
+3. Set the bot name and username (username must end with `bot`).
+4. Safely copy and store the issued Bot Token (format: `<digits>:<alphanumeric_string>`).
 
-1. Open Telegram and search for **@BotFather**
-2. Send the `/newbot` command
-3. Follow the prompts:
-   - Choose a name for your bot (e.g., "My Assistant Bot")
-   - Choose a username (must end with 'bot', e.g., "my_assistant_bot")
-4. **Copy the Bot Token** (format: `<YOUR_BOT_TOKEN>` - digits:alphanumeric string)
+### 2) Get Chat ID
 
-### 2. Get Your Chat ID
+Methods:
 
-**Method 1: Using @userinfobot**
-1. Search for **@userinfobot** in Telegram
-2. Start the bot - it will display your Chat ID
-
-**Method 2: Using @getidsbot**
-1. Search for **@getidsbot** in Telegram
-2. Start the bot - it will show your user ID
-
-**Method 3: For Group Chats**
-1. Add your bot to the group
-2. Send a test message in the group
-3. Visit: `https://api.telegram.org/bot<BOT_TOKEN>/getUpdates`
-4. Look for `"chat":{"id":-1001234567890,...}` in the response
-
-**Note**: Group chat IDs are negative numbers (e.g., `-1001234567890`)
+- **Use @userinfobot or @getidsbot**: When you start the bot, it will display your user ID (or group ID).
+- **For groups**: Add the bot to the group, send a test message, then call `https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates` to find the chat.id value (group IDs are negative, e.g., `-1001234567890`).
 
 ## MCP Client Configuration
 
-### Prerequisites
+This project can be integrated with Claude Code, GitHub Copilot, etc. through MCP (Model Context Protocol). Below are configuration examples.
 
-Before configuring your MCP client, ensure:
-1. ✅ `telegram-bot-mcp` is installed globally: `npm install -g telegram-bot-mcp`
-2. ✅ You have `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` environment variables ready
-
-### Claude Code
-
-#### Config File Location
-
-- **Windows**: `%USERPROFILE%\.claude.json`
-- **macOS/Linux**: `~/.claude.json`
-
-#### Setup Instructions
-
-1. Open your Claude configuration file (create if it doesn't exist)
-2. Add the following configuration:
+### Claude Code Example (.claude.json)
 
 ```json
 {
   "mcpServers": {
     "telegram-bot": {
-      "command": "telegram-bot-mcp",
+      "command": "telegram-chat-bot-mcp",
       "env": {
         "TELEGRAM_BOT_TOKEN": "<YOUR_BOT_TOKEN>",
         "TELEGRAM_CHAT_ID": "<YOUR_CHAT_ID>"
@@ -123,20 +60,15 @@ Before configuring your MCP client, ensure:
 }
 ```
 
-3. Save and restart Claude Code
+### GitHub Copilot (VS Code) Example
 
-### GitHub Copilot (VS Code)
-
-#### Setup Instructions
-
-1. Open VS Code settings (`.vscode/settings.json` in your workspace or global settings)
-2. Add the following configuration:
+Add the following to `.vscode/settings.json` or user settings:
 
 ```json
 {
   "github.copilot.chat.mcp.servers": {
     "telegram-bot": {
-      "command": "telegram-bot-mcp",
+      "command": "telegram-chat-bot-mcp",
       "env": {
         "TELEGRAM_BOT_TOKEN": "<YOUR_BOT_TOKEN>",
         "TELEGRAM_CHAT_ID": "<YOUR_CHAT_ID>"
@@ -146,321 +78,140 @@ Before configuring your MCP client, ensure:
 }
 ```
 
-3. Reload the VS Code window (Ctrl+Shift+P → Developer: Reload Window)
-
-### Environment Variables
-
-Set your Telegram credentials before running:
-
-#### Windows (PowerShell)
-```powershell
-$env:TELEGRAM_BOT_TOKEN = "your_bot_token_here"
-$env:TELEGRAM_CHAT_ID = "your_chat_id_here"
-```
-
-#### Windows (Command Prompt)
-```cmd
-set TELEGRAM_BOT_TOKEN=your_bot_token_here
-set TELEGRAM_CHAT_ID=your_chat_id_here
-```
-
-#### macOS/Linux (Bash/Zsh)
-```bash
-export TELEGRAM_BOT_TOKEN="your_bot_token_here"
-export TELEGRAM_CHAT_ID="your_chat_id_here"
-```
-
-Or create a `.env` file in your working directory:
-```
-TELEGRAM_BOT_TOKEN=your_bot_token_here
-TELEGRAM_CHAT_ID=your_chat_id_here
-```
-
 ## Usage
 
-### Quick Start
+This repository provides the following main MCP tools. When you call tools from Claude Code, etc., messages are automatically sent to Telegram.
 
-Once configured in your MCP client (Claude Code or GitHub Copilot), you can use the tools directly:
+### Provided Tools (5)
 
-1. **In Claude Code**: Ask Claude to send a message to Telegram
-2. **In GitHub Copilot**: Use the Telegram Bot tools in your chat
+1. `send_telegram_text` — Send plain text messages
+2. `send_telegram_markdown` — Convert Markdown to Telegram HTML and send (recommended)
+3. `send_telegram_with_buttons` — Send messages with inline keyboard (buttons)
+4. `send_telegram_photo` — Send images/photos (URL or Telegram file_id)
+5. `markdown_to_telegram_html` — Internal: Markdown → Telegram HTML conversion
 
-### Available MCP Tools (5 Tools)
+Parameter examples for each tool are the same as in the Korean section, and by default use the `TELEGRAM_CHAT_ID` set in environment variables (you can optionally pass individual `chatId`).
 
-#### 1. `send_telegram_text`
-Send simple plaintext messages to Telegram
+## Supported Markdown Syntax (Summary)
 
-**Usage in Claude/Copilot:**
-```
-"Send 'Hello from Claude!' to my Telegram chat"
-```
-
-**Tool Parameters:**
-- `text` (required): Message text
-- `chatId` (optional): Target chat ID (uses env var if not provided)
-
-#### 2. `send_telegram_markdown` ⭐ **Recommended**
-Convert Markdown to Telegram HTML format and send automatically
-
-**Usage in Claude/Copilot:**
-```
-"Send this markdown to Telegram:
-# Project Update
-- Task 1: ✅ Completed
-- Task 2: 🚧 In Progress
-**Note**: Deadline is tomorrow"
-```
-
-**Tool Parameters:**
-- `markdown` (required): Markdown formatted text
-- `fallbackToText` (optional): Automatically fallback to plaintext if HTML parsing fails
-- `chatId` (optional): Target chat ID
-
-#### 3. `send_telegram_with_buttons`
-Send messages with interactive inline keyboard buttons
-
-**Tool Parameters:**
-- `text` (required): Message text
-- `buttons` (required): Array of button rows
-  - Each button: `{"text": "Button Text", "url": "https://..." }` or `{"text": "Button", "callback_data": "action"}`
-- `chatId` (optional): Target chat ID
-
-#### 4. `send_telegram_photo`
-Send images/photos with captions to Telegram
-
-**Tool Parameters:**
-- `photo` (required): HTTPS URL to image
-- `caption` (optional): Photo caption (supports Markdown)
-- `chatId` (optional): Target chat ID
-
-#### 5. `markdown_to_telegram_html` (Internal)
-Converts Markdown to Telegram HTML format (automatically called by `send_telegram_markdown`)
-
-### Supported Markdown Syntax
-
-| Syntax | Markdown Example | Telegram Rendering |
-|--------|------------------|-------------------|
-| **Headers** | `# H1`, `## H2`, `### H3` | **📌 H1**, **H2**, **_H3_** |
-| **Bold** | `**bold**` | **bold** |
-| **Italic** | `*italic*` | *italic* |
-| **Inline Code** | `` `code` `` | `code` |
-| **Code Block** | ` ```python\ncode\n``` ` | <pre>code</pre> |
-| **Ordered List** | `1. First\n2. Second` | 1. First<br>2. Second |
-| **Unordered List** | `- Item` | • Item |
-| **Table** | `\| A \| B \|\n\|--\|--\|` | <pre>table</pre> (monospace) |
-| **Image** | `![alt](https://...)` | 🖼️ [alt](url) |
-| **Link** | `[text](https://...)` | Clickable link |
-| **Blockquote** | `> quote` | *❝ quote* |
+| Syntax | Example | Telegram Rendering |
+|--------|---------|-------------------|
+| Header | `# H1`, `## H2` | Bold heading/emphasis |
+| Bold | `**bold**` | **bold** |
+| Italic | `*italic*` | *italic* |
+| Inline Code | `` `code` `` | `code` |
+| Code Block | ``` ```python\ncode\n``` ``` | `<pre>` block |
+| List | `- item` | • item |
+| Table | `| A | B |` | `<pre>` monospace text |
+| Image | `![alt](https://...)` | Validated before sending |
 
 ## Environment Variables
 
 ### Required
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `TELEGRAM_BOT_TOKEN` | Bot Token from @BotFather | `<digits>:<alphanumeric_string>` |
-| `TELEGRAM_CHAT_ID` | Target chat ID | `123456789` or `-1001234567890` |
+| Variable | Description |
+|----------|-------------|
+| `TELEGRAM_BOT_TOKEN` | Bot Token received from @BotFather |
+| `TELEGRAM_CHAT_ID` | Default target Chat ID (user or group) |
 
-### Optional (Logging)
+### Optional (Logging Related)
 
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `LOG_LEVEL` | Log level | `INFO` |
 | `LOG_DIR` | Log directory | `./logs` |
-| `LOG_RETENTION_DAYS` | Days to keep logs | `30` |
-| `LOG_ENABLE_CONSOLE` | Console output | `true` |
+| `LOG_RETENTION_DAYS` | Log retention days | `30` |
+| `LOG_ENABLE_CONSOLE` | Console output enabled | `true` |
 
 ## Testing
 
-### Using the CLI
+### Provided Test Scripts
 
-Once installed via npm, you can test the MCP server directly:
-
-```bash
-# Set environment variables first
-export TELEGRAM_BOT_TOKEN="your_bot_token"
-export TELEGRAM_CHAT_ID="your_chat_id"
-
-# Run the MCP server (for testing)
-telegram-bot-mcp
-```
-
-### Testing with MCP Clients
-
-After configuring in your MCP client:
-
-1. **Claude Code**: Open Claude and ask it to send a test message
-2. **GitHub Copilot**: Use the Telegram tools in VS Code chat
-
-**Test Examples:**
-```
-"Send a test message: Hello, I'm testing the Telegram MCP!"
-"Send a markdown message with headers and lists to Telegram"
-"Send an image to my Telegram chat"
-```
-
-### Development Testing (From Source)
-
-If you cloned the repository:
+Several test scripts are included in the project root `scripts/`. For example:
 
 ```bash
-# Set environment variables
-export TELEGRAM_BOT_TOKEN="your_bot_token"
-export TELEGRAM_CHAT_ID="your_chat_id"
+# Plain text message test
+npx tsx scripts/test-telegram-text.ts
 
-# Run test scripts
-npm run test:telegram:text        # Test plaintext message
-npm run test:telegram:markdown    # Test markdown conversion
+# Markdown conversion test
+npx tsx scripts/test-telegram-markdown.ts
+
+# Table rendering test
+npx tsx scripts/test-telegram-table-only.ts
+
+# Public image sending test (Wikimedia, etc.)
+npx tsx scripts/test-telegram-image-wiki.ts
 ```
+
+You must set environment variables (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`) in the current session when running tests.
 
 ## Development
 
-If you want to modify the source code:
-
 ```bash
-# Clone and install
-git clone https://github.com/ice3x2/telegram-chat-bot-mcp.git
-cd telegram-chat-bot-mcp
 npm install
-
-# Development commands
-npm run build        # Build TypeScript to dist/
-npm run dev          # Development mode with tsx
-npm run lint         # Lint check
-npm run lint:fix     # Auto-fix linting issues
-
-# Run the server locally
-npm run start        # Run compiled version
-# or
-npm run dev          # Run with tsx (TypeScript directly)
+npm run build
+npm run dev
+npm run lint
+npm run lint:fix
 ```
 
-## Limitations
+## Limitations and Considerations
 
 ### Telegram Bot API Constraints
 
-- **HTML Tags**: Limited subset only (no tables, only basic formatting)
-- **Tables**: Rendered as `<pre>` monospace text
-- **Image Protocol**: HTTPS only
-- **Image Size**: Max 10MB for photos
-- **Message Length**: 4096 characters max
+- HTML Tags: Telegram only supports allowed tags (`b,i,u,code,pre,a`, etc.). `<table>` is not supported.
+- Tables: Tables are converted to `<pre>` monospace text before sending.
+- Images: HTTPS only, file size limit (approx. 10MB for photos)
+- Message Length: Messages exceeding Telegram limit (approx. 4096 characters) must be split.
 
 ### Supported HTML Tags
 
-Telegram supports only these tags:
-- `<b>`, `<strong>`: Bold
+- `<b>`, `<strong>`: Bold text
 - `<i>`, `<em>`: Italic
 - `<u>`, `<ins>`: Underline
+- `<s>`, `<strike>`, `<del>`: Strikethrough
 - `<code>`: Inline code
-- `<pre>`: Code block
-- `<a href="...">`: Link
-
-## FAQ
-
-### Q: How do I install `telegram-bot-mcp`?
-**A**: Use npm:
-```bash
-npm install -g telegram-bot-mcp
-```
-Once installed globally, you can reference it in your MCP client configuration.
-
-### Q: "MCP server not found" or "command not found" error
-**A**: Check:
-1. ✅ Package is installed: `npm list -g telegram-bot-mcp`
-2. ✅ Global npm bin is in PATH: Check your shell profile
-3. ✅ Try running with full path: Find it with `npm config get prefix`
-
-### Q: Messages not sending
-**A**: Check:
-1. ✅ `TELEGRAM_BOT_TOKEN` is set and valid (from @BotFather)
-2. ✅ `TELEGRAM_CHAT_ID` is set and correct (use @userinfobot)
-3. ✅ Bot is added to group (for group chats)
-4. ✅ Environment variables are properly passed to MCP client
-
-### Q: MCP configuration isn't working
-**A**: Verify:
-1. ✅ Config file location:
-   - Claude Code: `~/.claude.json` or `%USERPROFILE%\.claude.json`
-   - GitHub Copilot: `.vscode/settings.json`
-2. ✅ JSON syntax is valid (use a JSON validator)
-3. ✅ Restart your MCP client after configuration changes
-
-### Q: Images not displaying
-**A**: Images must be:
-- ✅ HTTPS URLs (HTTP not supported by Telegram)
-- ✅ Under 10MB in size
-- ✅ Publicly accessible (no authentication)
-- ✅ Valid Content-Type: `image/*`
-
-### Q: HTML/Markdown formatting issues
-**A**: Tips:
-- ✅ Use `send_telegram_markdown` tool (automatic conversion)
-- ✅ Use `fallbackToText: true` for automatic plaintext fallback
-- ✅ Remember: Telegram only supports basic HTML tags
-- ✅ Tables are rendered as `<pre>` monospace text
-
-### Q: Can I use this without an MCP client?
-**A**: Yes, if you install from source:
-```bash
-git clone https://github.com/ice3x2/telegram-chat-bot-mcp.git
-cd telegram-chat-bot-mcp
-npm install
-npm run dev
-```
-But the package is primarily designed for MCP integration.
+- `<pre>`: Code/monospace block
+- `<a href="">`: Link
 
 ## Logging
 
-### Log File Structure
+Logs are stored in JSON format in the `logs/` folder, with key events as follows:
 
-```
-logs/
-├── app-2025-11-04.log          # Daily log (all levels)
-├── errors-2025-11-04.log       # Errors only
-└── ...                         # Auto-deleted after 30 days
-```
+- `sending_message`: Sending started
+- `message_sent`: Sending succeeded
+- `markdown_parse_failed`: Markdown → HTML conversion failed and fallback used
+- `image_validation_failed`: Image validation failed
+- `send_failed`: Sending failed
 
-### Log Format (JSON)
-
-```json
-{
-  "timestamp": "2025-11-04T06:17:51.378Z",
-  "level": "INFO",
-  "module": "sendTelegramText",
-  "event": "message_sent",
-  "messageId": 106,
-  "chatId": "123456789"
-}
-```
+Log retention period and level can be adjusted via environment variables.
 
 ## Security
 
-⚠️ **Bot Token and Chat ID are sensitive:**
-- Never commit to Git
-- Don't expose in public repositories
-- Use environment variables or .env files
-- Regenerate token if leaked (@BotFather → /revoke)
+⚠️ **Bot Token and Chat ID are sensitive information.**
+
+- Never commit to Git.
+- Do not expose in public repositories.
+- If suspected leaked, regenerate token (@BotFather) is recommended.
 
 ## License
 
 MIT License - [LICENSE](LICENSE)
 
-## Links
+## Useful Links
 
-- [Telegram Bot API](https://core.telegram.org/bots/api)
-- [Model Context Protocol](https://github.com/modelcontextprotocol)
-- [Claude Code](https://claude.ai/desktop)
+- Telegram Bot API: https://core.telegram.org/bots/api
+- Model Context Protocol: https://github.com/modelcontextprotocol
 
 ---
 
 ## Korean / 한국어
-
-Telegram Bot MCP 서버는 Telegram Bot API를 통해 메시지를 전송하는 MCP (Model Context Protocol) 서버로, Markdown을 Telegram용 HTML로 자동 변환하고 이미지 검증, 구조화된 로깅, 폴백(fallback) 처리를 제공합니다.
+Telegram Bot MCP 서버는 Telegram Bot API를 통해 메시지를 전송하는 MCP (Model Context Protocol) 서버.
 
 ## 주요 기능
 
 - 🤖 Telegram Bot API 통합: Telegram 채팅(개인/그룹)에 직접 메시지 전송
-- 📝 Markdown → HTML 자동 변환: 제목, 리스트, 코드 블록, 표(고정폭), 이미지 등 지원
+- 📝 간단한 Markdown → HTML 자동 변환: 제목, 리스트, 코드 블록, 표(고정폭), 이미지 등 지원
 - 🖼️ 이미지 URL 검증: HTTP 상태, Content-Type, 파일 크기 등 사전 검증
 - 🔄 자동 폴백: HTML 파싱/전송 실패 시 평문으로 자동 전송
 - 📊 구조화된 로깅: JSON 형식 로그, 기본 30일 보관 정책

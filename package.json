@@ -6,7 +6,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "telegram-bot-mcp": "dist/index.js"
+    "telegram-chat-bot-mcp": "dist/index.js"
   },
   "files": [
     "dist",

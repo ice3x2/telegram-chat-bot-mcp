@@ -1,8 +1,8 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
-import { sendTelegramText } from './tools/sendTelegramText';
-import { sendTelegramMarkdown } from './tools/sendTelegramMarkdown';
+import { sendTelegramText } from './tools/sendTelegramText.js';
+import { sendTelegramMarkdown } from './tools/sendTelegramMarkdown.js';
 import { startLogCleanupScheduler } from './utils/logCleaner.js';
 import { logger } from './utils/logger.js';
 

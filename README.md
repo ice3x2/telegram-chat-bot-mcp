@@ -240,7 +240,7 @@ Telegram Bot MCP 서버는 Telegram Bot API를 통해 메시지를 전송하는 
 {
   "mcpServers": {
     "telegram-bot": {
-      "command": "telegram-bot-mcp",
+      "command": "telegram-chat-bot-mcp",
       "env": {
         "TELEGRAM_BOT_TOKEN": "<YOUR_BOT_TOKEN>",
         "TELEGRAM_CHAT_ID": "<YOUR_CHAT_ID>"
@@ -258,7 +258,7 @@ Telegram Bot MCP 서버는 Telegram Bot API를 통해 메시지를 전송하는 
 {
   "github.copilot.chat.mcp.servers": {
     "telegram-bot": {
-      "command": "telegram-bot-mcp",
+      "command": "telegram-chat-bot-mcp",
       "env": {
         "TELEGRAM_BOT_TOKEN": "<YOUR_BOT_TOKEN>",
         "TELEGRAM_CHAT_ID": "<YOUR_CHAT_ID>"

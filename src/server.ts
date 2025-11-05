@@ -104,9 +104,9 @@ export async function startServer() {
   // Start log cleanup scheduler (runs every 24 hours)
   startLogCleanupScheduler(24);
 
-  const server = new McpServer({ 
-    name: 'telegram-bot-mcp', 
-    version: '1.0.0' 
+  const server = new McpServer({
+    name: 'telegram-bot-mcp',
+    version: '1.0.0'
   });
 
   // Register Telegram tools
@@ -141,9 +141,9 @@ export async function startServer() {
       title: 'Send Telegram Text',
       description: 'Send a plain text message to configured Telegram chat',
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      inputSchema: (z.object({ text: z.string().describe('Text message to send') }) as any),
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      outputSchema: (z.object({ success: z.boolean(), messageId: z.number().optional() }) as any)
+      inputSchema: (z.object({
+        text: z.string().describe('Text message to send')
+      }) as any)
     },
     sendTextHandler
   );
@@ -182,12 +182,10 @@ export async function startServer() {
       title: 'Send Telegram Markdown',
       description: 'Convert Markdown to Telegram HTML and send. Falls back to plain text on failure.',
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      inputSchema: (z.object({ 
+      inputSchema: (z.object({
         markdown: z.string().describe('Markdown content to convert and send'),
         fallbackToText: z.boolean().optional().describe('Fall back to plain text if Markdown conversion fails')
-      }) as any),
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      outputSchema: (z.object({ success: z.boolean(), messageId: z.number().optional(), usedFallback: z.boolean().optional() }) as any)
+      }) as any)
     },
     sendMarkdownHandler
   );

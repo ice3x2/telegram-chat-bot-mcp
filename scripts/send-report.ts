@@ -1,6 +1,6 @@
 ﻿import { sendTelegramMarkdown } from '../src/tools/sendTelegramMarkdown.js';
 
-const report = \$report\;
+const report = process.argv[2] || 'No report content provided';
 
 async function sendReport() {
   const botToken = process.env.TELEGRAM_BOT_TOKEN;

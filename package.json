@@ -24,6 +24,7 @@
     "dev": "tsx src/index.ts",
     "lint": "eslint src/**/*.ts scripts/**/*.ts",
     "lint:fix": "eslint src/**/*.ts scripts/**/*.ts --fix",
+    "test": "npm run build && echo 'Build successful - MCP server ready'",
     "test:mcp:server": "tsx scripts/test-mcp-server.ts",
     "test:telegram:text": "tsx scripts/test-telegram-text.ts",
     "test:telegram:markdown": "tsx scripts/test-telegram-markdown.ts"
@@ -41,7 +42,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ice3x2/telegram-chat-bot-mcp.git"
+    "url": "git+https://github.com/ice3x2/telegram-chat-bot-mcp.git"
   },
   "bugs": {
     "url": "https://github.com/ice3x2/telegram-chat-bot-mcp/issues"

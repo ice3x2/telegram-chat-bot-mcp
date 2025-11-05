@@ -17,7 +17,8 @@ export type LogEvent =
   | 'invalid_webhook_url'
   | 'server_starting'
   | 'sending_message'
-  | 'markdown_parse_failed';
+  | 'markdown_parse_failed'
+  | 'env_check';
 
 /**
  * 로그 엔트리 기본 구조

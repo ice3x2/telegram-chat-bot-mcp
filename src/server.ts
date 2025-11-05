@@ -41,9 +41,23 @@ function validateTelegramChatId(chatId: string): { valid: boolean; error?: strin
 }
 
 export async function startServer() {
-  // Get Telegram configuration
+  // Get Telegram configuration from environment variables
   const telegramBotToken = process.env.TELEGRAM_BOT_TOKEN;
   const telegramChatId = process.env.TELEGRAM_CHAT_ID;
+
+  // Log environment for debugging (sanitized)
+  const tokenPresent = !!telegramBotToken;
+  const chatIdPresent = !!telegramChatId;
+  logger.info('server', 'env_check', { tokenPresent, chatIdPresent });
+  
+  // If debugging, show sanitized token info
+  if (process.env.DEBUG_MCP) {
+    console.error(`[DEBUG] Token present: ${tokenPresent}`);
+    console.error(`[DEBUG] Chat ID present: ${chatIdPresent}`);
+    if (telegramBotToken) {
+      console.error(`[DEBUG] Token format: ${telegramBotToken.substring(0, 10)}...`);
+    }
+  }
 
   let validationError: string | undefined;
 
@@ -69,6 +83,10 @@ export async function startServer() {
   if (validationError) {
     logger.error('server', 'server_start_failed', { error: validationError });
     console.error(`❌ Error: ${validationError}`);
+    console.error('');
+    console.error('Environment variable check:');
+    console.error(`  TELEGRAM_BOT_TOKEN is set: ${tokenPresent}`);
+    console.error(`  TELEGRAM_CHAT_ID is set: ${chatIdPresent}`);
     console.error('');
     console.error('For Telegram Bot:');
     console.error('  1. Create a bot with @BotFather');
@@ -96,14 +114,24 @@ export async function startServer() {
   const sendTextHandler = (async ({ text }: { text: string }) => {
     try {
       if (!telegramBotToken || !telegramChatId) {
-        return { content: [{ type: 'text', text: 'Bot token and chat ID are not configured' }], isError: true };
+        logger.error('server', 'send_failed', { error: 'Bot token and chat ID not configured' });
+        return { 
+          content: [{ type: 'text', text: 'Error: Bot token and chat ID are not configured' }], 
+          isError: true 
+        };
       }
       const result = await sendTelegramText({ text }, telegramBotToken, telegramChatId);
       const out = { success: true, messageId: result.message_id };
-      return { content: [{ type: 'text', text: JSON.stringify(out) }], structuredContent: out };
+      return { 
+        content: [{ type: 'text', text: JSON.stringify(out, null, 2) }]
+      };
     } catch (err: unknown) {
       const e = err as Error;
-      return { content: [{ type: 'text', text: `Error: ${e.message}` }], isError: true };
+      logger.error('server', 'send_failed', { error: e.message });
+      return { 
+        content: [{ type: 'text', text: `Error: ${e.message}` }], 
+        isError: true 
+      };
     }
   }) as any;
 
@@ -113,7 +141,7 @@ export async function startServer() {
       title: 'Send Telegram Text',
       description: 'Send a plain text message to configured Telegram chat',
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      inputSchema: (z.object({ text: z.string() }) as any),
+      inputSchema: (z.object({ text: z.string().describe('Text message to send') }) as any),
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       outputSchema: (z.object({ success: z.boolean(), messageId: z.number().optional() }) as any)
     },
@@ -124,17 +152,27 @@ export async function startServer() {
   const sendMarkdownHandler = (async ({ markdown, fallbackToText }: { markdown: string; fallbackToText?: boolean }) => {
     try {
       if (!telegramBotToken || !telegramChatId) {
-        return { content: [{ type: 'text', text: 'Bot token and chat ID are not configured' }], isError: true };
+        logger.error('server', 'send_failed', { error: 'Bot token and chat ID not configured' });
+        return { 
+          content: [{ type: 'text', text: 'Error: Bot token and chat ID are not configured' }], 
+          isError: true 
+        };
       }
       const result = await sendTelegramMarkdown(
         { markdown, fallbackToText },
         telegramBotToken,
         telegramChatId
       );
-      return { content: [{ type: 'text', text: JSON.stringify(result) }], structuredContent: result };
+      return { 
+        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }]
+      };
     } catch (err: unknown) {
       const e = err as Error;
-      return { content: [{ type: 'text', text: `Error: ${e.message}` }], isError: true };
+      logger.error('server', 'send_failed', { error: e.message });
+      return { 
+        content: [{ type: 'text', text: `Error: ${e.message}` }], 
+        isError: true 
+      };
     }
   }) as any;
 
@@ -144,7 +182,10 @@ export async function startServer() {
       title: 'Send Telegram Markdown',
       description: 'Convert Markdown to Telegram HTML and send. Falls back to plain text on failure.',
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      inputSchema: (z.object({ markdown: z.string(), fallbackToText: z.boolean().optional() }) as any),
+      inputSchema: (z.object({ 
+        markdown: z.string().describe('Markdown content to convert and send'),
+        fallbackToText: z.boolean().optional().describe('Fall back to plain text if Markdown conversion fails')
+      }) as any),
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       outputSchema: (z.object({ success: z.boolean(), messageId: z.number().optional(), usedFallback: z.boolean().optional() }) as any)
     },

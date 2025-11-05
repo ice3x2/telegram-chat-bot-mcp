@@ -3,6 +3,9 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { z } from 'zod';
 import { sendTelegramText } from './tools/sendTelegramText.js';
 import { sendTelegramMarkdown } from './tools/sendTelegramMarkdown.js';
+import { sendTelegramWithButtons } from './tools/sendTelegramWithButtons.js';
+import { sendTelegramPhoto } from './tools/sendTelegramPhoto.js';
+import { markdownToTelegramHTML } from './tools/markdownToTelegram.js';
 import { startLogCleanupScheduler } from './utils/logCleaner.js';
 import { logger } from './utils/logger.js';
 
@@ -140,10 +143,9 @@ export async function startServer() {
     {
       title: 'Send Telegram Text',
       description: 'Send a plain text message to configured Telegram chat',
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      inputSchema: (z.object({
+      inputSchema: {
         text: z.string().describe('Text message to send')
-      }) as any)
+      }
     },
     sendTextHandler
   );
@@ -181,13 +183,138 @@ export async function startServer() {
     {
       title: 'Send Telegram Markdown',
       description: 'Convert Markdown to Telegram HTML and send. Falls back to plain text on failure.',
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      inputSchema: (z.object({
+      inputSchema: {
         markdown: z.string().describe('Markdown content to convert and send'),
         fallbackToText: z.boolean().optional().describe('Fall back to plain text if Markdown conversion fails')
-      }) as any)
+      }
     },
     sendMarkdownHandler
+  );
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sendButtonsHandler = (async ({ text, buttons, parseMode }: {
+    text: string;
+    buttons: any[][];
+    parseMode?: 'HTML' | 'MarkdownV2';
+  }) => {
+    try {
+      if (!telegramBotToken || !telegramChatId) {
+        logger.error('server', 'send_failed', { error: 'Bot token and chat ID not configured' });
+        return {
+          content: [{ type: 'text', text: 'Error: Bot token and chat ID are not configured' }],
+          isError: true
+        };
+      }
+      const result = await sendTelegramWithButtons(
+        { text, buttons, parseMode },
+        telegramBotToken,
+        telegramChatId
+      );
+      return {
+        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }]
+      };
+    } catch (err: unknown) {
+      const e = err as Error;
+      logger.error('server', 'send_failed', { error: e.message });
+      return {
+        content: [{ type: 'text', text: `Error: ${e.message}` }],
+        isError: true
+      };
+    }
+  }) as any;
+
+  server.registerTool(
+    'send_telegram_with_buttons',
+    {
+      title: 'Send Telegram with Buttons',
+      description: 'Send a message with inline keyboard buttons to Telegram',
+      inputSchema: {
+        text: z.string().describe('Message text to send'),
+        buttons: z.array(z.array(z.object({
+          text: z.string().describe('Button text'),
+          url: z.string().optional().describe('Button URL (for URL buttons)'),
+          callback_data: z.string().optional().describe('Callback data (for callback buttons)'),
+          switch_inline_query: z.string().optional().describe('Inline query to switch to')
+        }))).describe('2D array of inline keyboard buttons'),
+        parseMode: z.enum(['HTML', 'MarkdownV2']).optional().describe('Parse mode for text formatting')
+      }
+    },
+    sendButtonsHandler
+  );
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sendPhotoHandler = (async ({ photo, caption, parseMode }: {
+    photo: string;
+    caption?: string;
+    parseMode?: 'HTML' | 'MarkdownV2';
+  }) => {
+    try {
+      if (!telegramBotToken || !telegramChatId) {
+        logger.error('server', 'send_failed', { error: 'Bot token and chat ID not configured' });
+        return {
+          content: [{ type: 'text', text: 'Error: Bot token and chat ID are not configured' }],
+          isError: true
+        };
+      }
+      const result = await sendTelegramPhoto(
+        { photo, caption, parseMode },
+        telegramBotToken,
+        telegramChatId
+      );
+      return {
+        content: [{ type: 'text', text: JSON.stringify(result, null, 2) }]
+      };
+    } catch (err: unknown) {
+      const e = err as Error;
+      logger.error('server', 'send_failed', { error: e.message });
+      return {
+        content: [{ type: 'text', text: `Error: ${e.message}` }],
+        isError: true
+      };
+    }
+  }) as any;
+
+  server.registerTool(
+    'send_telegram_photo',
+    {
+      title: 'Send Telegram Photo',
+      description: 'Send a photo/image to Telegram (supports URL or file_id)',
+      inputSchema: {
+        photo: z.string().describe('Photo URL (https://) or Telegram file_id'),
+        caption: z.string().optional().describe('Optional caption for the photo'),
+        parseMode: z.enum(['HTML', 'MarkdownV2']).optional().describe('Parse mode for caption formatting')
+      }
+    },
+    sendPhotoHandler
+  );
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const markdownConverter = (async ({ markdown }: { markdown: string }) => {
+    try {
+      const html = markdownToTelegramHTML(markdown);
+      return {
+        content: [{ type: 'text', text: html }]
+      };
+    } catch (err: unknown) {
+      const e = err as Error;
+      logger.error('server', 'conversion_failed', { error: e.message });
+      return {
+        content: [{ type: 'text', text: `Error: ${e.message}` }],
+        isError: true
+      };
+    }
+  }) as any;
+
+  server.registerTool(
+    'markdown_to_telegram_html',
+    {
+      title: 'Convert Markdown to Telegram HTML',
+      description: 'Convert Markdown text to Telegram-compatible HTML format',
+      inputSchema: {
+        markdown: z.string().describe('Markdown content to convert')
+      }
+    },
+    markdownConverter
   );
 
   // Use stdio transport for stdin/stdout integration

@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { telegramAxios } from '../utils/axiosConfig.js';
 import { markdownToTelegramHTML } from './markdownToTelegram.js';
 import { sendTelegramText } from './sendTelegramText.js';
 import { logger } from '../utils/logger.js';
@@ -64,10 +64,7 @@ export async function sendTelegramMarkdown(
       parse_mode: 'HTML'
     };
 
-    const response = await axios.post(url, payload, {
-      timeout: 5000,
-      headers: { 'Content-Type': 'application/json; charset=utf-8' }
-    });
+    const response = await telegramAxios.post(url, payload);
 
     if (!response.data.ok) {
       throw new Error(`Telegram API error: ${response.data.description}`);
@@ -84,10 +81,13 @@ export async function sendTelegramMarkdown(
       usedFallback: false
     };
   } catch (error: any) {
+    const errorMessage = error.message || error.toString();
+
     // Fallback: Send plain text
     if (fallbackToText) {
       logger.warn('sendTelegramMarkdown', 'fallback_used', {
-        reason: error.message
+        reason: errorMessage,
+        errorCode: error.code
       });
 
       const result = await sendTelegramText({ text: markdown, chatId }, botToken, defaultChatId);
@@ -95,10 +95,15 @@ export async function sendTelegramMarkdown(
         success: true,
         messageId: result.message_id,
         usedFallback: true,
-        fallbackReason: error.message
+        fallbackReason: errorMessage
       };
     } else {
-      throw error;
+      logger.error('sendTelegramMarkdown', 'send_failed', {
+        error: errorMessage,
+        errorCode: error.code,
+        responseData: error.response?.data
+      });
+      throw new Error(`Markdown send failed: ${errorMessage}`);
     }
   }
 }

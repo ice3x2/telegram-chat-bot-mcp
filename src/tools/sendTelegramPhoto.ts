@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { telegramAxios } from '../utils/axiosConfig.js';
 import { validateImageUrl } from '../utils/imageValidator.js';
 import { logger } from '../utils/logger.js';
 
@@ -66,9 +66,8 @@ export async function sendTelegramPhoto(
   });
 
   try {
-    const response = await axios.post(url, payload, {
-      timeout: 10000,  // Longer timeout for photo upload
-      headers: { 'Content-Type': 'application/json; charset=utf-8' }
+    const response = await telegramAxios.post(url, payload, {
+      timeout: 15000  // Longer timeout for photo upload
     });
 
     if (!response.data.ok) {
@@ -82,11 +81,25 @@ export async function sendTelegramPhoto(
 
     return response.data.result;
   } catch (error: any) {
+    const errorMessage = error.message || error.toString();
+    const errorCode = error.code;
+    const responseData = error.response?.data;
+
     logger.error('sendTelegramPhoto', 'send_failed', {
-      error: error.message,
+      error: errorMessage,
+      errorCode,
       chatId,
-      responseData: error.response?.data
+      responseData,
+      stack: error.stack?.split('\n')[0]
     });
-    throw error;
+
+    // Re-throw with more context
+    if (errorCode === 'ETIMEDOUT' || errorCode === 'ECONNABORTED') {
+      throw new Error(`Photo upload timeout: ${errorMessage}`);
+    } else if (responseData) {
+      throw new Error(`Telegram API error: ${responseData.description || errorMessage}`);
+    } else {
+      throw new Error(`Photo send failed: ${errorMessage} (code: ${errorCode || 'unknown'})`);
+    }
   }
 }

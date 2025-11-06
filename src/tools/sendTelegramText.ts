@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { telegramAxios } from '../utils/axiosConfig.js';
 import { logger } from '../utils/logger.js';
 
 export interface SendTelegramTextParams {
@@ -36,10 +36,7 @@ export async function sendTelegramText(
   });
 
   try {
-    const response = await axios.post(url, payload, {
-      timeout: 5000,
-      headers: { 'Content-Type': 'application/json; charset=utf-8' }
-    });
+    const response = await telegramAxios.post(url, payload);
 
     if (!response.data.ok) {
       throw new Error(`Telegram API error: ${response.data.description}`);
@@ -52,11 +49,25 @@ export async function sendTelegramText(
 
     return response.data.result;
   } catch (error: any) {
+    const errorMessage = error.message || error.toString();
+    const errorCode = error.code;
+    const responseData = error.response?.data;
+
     logger.error('sendTelegramText', 'send_failed', {
-      error: error.message,
+      error: errorMessage,
+      errorCode,
       chatId,
-      responseData: error.response?.data
+      responseData,
+      stack: error.stack?.split('\n')[0] // First line of stack for debugging
     });
-    throw error;
+
+    // Re-throw with more context
+    if (errorCode === 'ETIMEDOUT' || errorCode === 'ECONNABORTED') {
+      throw new Error(`Network timeout: ${errorMessage}`);
+    } else if (responseData) {
+      throw new Error(`Telegram API error: ${responseData.description || errorMessage}`);
+    } else {
+      throw new Error(`Send failed: ${errorMessage} (code: ${errorCode || 'unknown'})`);
+    }
   }
 }

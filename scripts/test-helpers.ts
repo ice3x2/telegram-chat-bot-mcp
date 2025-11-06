@@ -43,9 +43,19 @@ export async function runTest<T>(
 }
 
 /**
+ * Test result types
+ */
+interface TelegramResult {
+  message_id?: number;
+  messageId?: number;
+  chat?: { id: number };
+  usedFallback?: boolean;
+}
+
+/**
  * Log test result details
  */
-export function logResult(result: any): void {
+export function logResult(result: TelegramResult): void {
   if (result.message_id) {
     console.log('Message ID:', result.message_id);
   }

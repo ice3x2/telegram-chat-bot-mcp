@@ -6,7 +6,7 @@
  * using JSON-RPC 2.0 protocol over stdin/stdout.
  */
 
-import { spawn } from 'child_process';
+import { spawn, ChildProcess } from 'child_process';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -18,28 +18,41 @@ interface JsonRpcRequest {
   jsonrpc: '2.0';
   id: number | string;
   method: string;
-  params?: any;
+  params?: Record<string, unknown>;
 }
 
 interface JsonRpcResponse {
   jsonrpc: '2.0';
   id: number | string;
-  result?: any;
+  result?: Record<string, unknown>;
   error?: {
     code: number;
     message: string;
-    data?: any;
+    data?: Record<string, unknown>;
   };
 }
 
+interface PendingRequest {
+  resolve: (value: Record<string, unknown>) => void;
+  reject: (reason: Error) => void;
+  method: string;
+}
+
+interface McpTool {
+  name: string;
+  title?: string;
+  description?: string;
+  inputSchema?: Record<string, unknown>;
+}
+
+interface ToolsListResult {
+  tools?: McpTool[];
+}
+
 class MCPAgentSimulator {
-  private server: any;
+  private server: ChildProcess | null = null;
   private messageId = 0;
-  private pendingRequests = new Map<number, {
-    resolve: (value: any) => void;
-    reject: (reason: any) => void;
-    method: string;
-  }>();
+  private pendingRequests = new Map<number, PendingRequest>();
   private buffer = '';
 
   constructor(private serverPath: string, private env: Record<string, string>) {}
@@ -109,19 +122,19 @@ class MCPAgentSimulator {
 
           if (response.error) {
             console.log(`❌ [${pending.method}] Error:`, response.error);
-            pending.reject(response.error);
+            pending.reject(new Error(response.error.message));
           } else {
             console.log(`✅ [${pending.method}] Success`);
-            pending.resolve(response.result);
+            pending.resolve(response.result || {});
           }
         }
-      } catch (err) {
+      } catch {
         console.error('⚠️  Failed to parse response:', line);
       }
     }
   }
 
-  private async sendRequest(method: string, params?: any): Promise<any> {
+  private async sendRequest(method: string, params?: Record<string, unknown>): Promise<Record<string, unknown>> {
     return new Promise((resolve, reject) => {
       const id = ++this.messageId;
       const request: JsonRpcRequest = {
@@ -148,7 +161,7 @@ class MCPAgentSimulator {
     });
   }
 
-  async initialize(): Promise<any> {
+  async initialize(): Promise<Record<string, unknown>> {
     return this.sendRequest('initialize', {
       protocolVersion: '2024-11-05',
       capabilities: {
@@ -161,11 +174,11 @@ class MCPAgentSimulator {
     });
   }
 
-  async listTools(): Promise<any> {
+  async listTools(): Promise<Record<string, unknown>> {
     return this.sendRequest('tools/list');
   }
 
-  async callTool(name: string, args: any): Promise<any> {
+  async callTool(name: string, args: Record<string, unknown>): Promise<Record<string, unknown>> {
     return this.sendRequest('tools/call', {
       name,
       arguments: args
@@ -174,7 +187,9 @@ class MCPAgentSimulator {
 
   async shutdown(): Promise<void> {
     console.log('\n🛑 Shutting down server...');
-    this.server.kill();
+    if (this.server) {
+      this.server.kill();
+    }
     return new Promise(resolve => {
       setTimeout(resolve, 500);
     });
@@ -210,7 +225,7 @@ async function runTests() {
 
     // Test 3: List tools
     console.log('\n🧪 Test 3: List Available Tools\n');
-    const tools = await agent.listTools();
+    const tools = await agent.listTools() as ToolsListResult;
     console.log('🔧 Available tools:', JSON.stringify(tools, null, 2));
 
     if (!tools || !tools.tools || tools.tools.length === 0) {
@@ -218,7 +233,7 @@ async function runTests() {
       console.error('Expected 5 tools, but got:', tools.tools?.length || 0);
     } else {
       console.log(`\n✅ Found ${tools.tools.length} tools:`);
-      tools.tools.forEach((tool: any, index: number) => {
+      tools.tools.forEach((tool, index) => {
         console.log(`   ${index + 1}. ${tool.name} - ${tool.description || 'No description'}`);
       });
     }
@@ -230,7 +245,8 @@ async function runTests() {
         text: '🤖 MCP Agent Simulator Test\n\nThis is a test message from the automated LLM agent simulator.'
       });
       console.log('📦 Result:', JSON.stringify(textResult, null, 2));
-    } catch (err: any) {
+    } catch (error) {
+      const err = error as Error;
       console.error('❌ Tool call failed:', err.message);
     }
 
@@ -253,7 +269,8 @@ npm test
         fallbackToText: true
       });
       console.log('📦 Result:', JSON.stringify(markdownResult, null, 2));
-    } catch (err: any) {
+    } catch (error) {
+      const err = error as Error;
       console.error('❌ Tool call failed:', err.message);
     }
 
@@ -262,7 +279,8 @@ npm test
     try {
       await agent.callTool('non_existent_tool', {});
       console.error('❌ Should have failed but succeeded!');
-    } catch (err: any) {
+    } catch (error) {
+      const err = error as Error;
       console.log('✅ Expected error:', err.message);
     }
 
@@ -277,9 +295,10 @@ npm test
     console.log('✅ Error handling: PASS');
     console.log('='.repeat(60));
 
-  } catch (error: any) {
-    console.error('\n❌ Test failed:', error.message);
-    console.error(error.stack);
+  } catch (error) {
+    const err = error as Error;
+    console.error('\n❌ Test failed:', err.message);
+    console.error(err.stack);
     process.exit(1);
   } finally {
     await agent.shutdown();
@@ -287,7 +306,8 @@ npm test
 }
 
 // Run tests
-runTests().catch(err => {
+runTests().catch((error: unknown) => {
+  const err = error as Error;
   console.error('❌ Fatal error:', err);
   process.exit(1);
 });

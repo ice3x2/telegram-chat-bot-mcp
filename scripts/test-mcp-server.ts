@@ -32,11 +32,11 @@ async function testMCPServer() {
   });
 
   // Collect output
-  let stdoutData = '';
+  let _stdoutData = '';
   let stderrData = '';
 
   server.stdout?.on('data', (data) => {
-    stdoutData += data.toString();
+    _stdoutData += data.toString();
     console.log('[STDOUT]', data.toString());
   });
 

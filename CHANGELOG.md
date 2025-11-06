@@ -5,6 +5,44 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.8] - 2025-11-06
+
+### Changed
+- **Documentation**: Comprehensive README.md overhaul
+  - Added Installation section with npm and npx instructions
+  - Added detailed MCP client configuration for 5 major AI tools:
+    - Claude Desktop (with correct config file paths)
+    - Claude Code (CLI) with priority order and reconnect commands
+    - VS Code (GitHub Copilot) with workspace and user settings
+    - Cursor IDE with global and project configs
+    - Windsurf IDE (Codeium) with platform-specific paths
+  - Added Troubleshooting section for common issues
+  - Fixed incorrect file path references (.claude.json → mcp.json)
+  - Ensured perfect English-Korean content parity
+- **Code Quality**: Removed all TypeScript lint warnings from test scripts
+  - Added proper type definitions (TelegramResult, McpTool, etc.)
+  - Replaced all `any` types with specific types in scripts/
+  - Fixed unused variable warnings
+
+### 변경됨
+- **문서화**: README.md 대대적 개선
+  - npm 및 npx 설치 방법이 포함된 Installation 섹션 추가
+  - 5개 주요 AI 도구에 대한 상세한 MCP 클라이언트 설정 추가:
+    - Claude Desktop (정확한 설정 파일 경로)
+    - Claude Code (CLI) 우선순위 및 재연결 명령어 포함
+    - VS Code (GitHub Copilot) 워크스페이스 및 사용자 설정
+    - Cursor IDE 전역 및 프로젝트 설정
+    - Windsurf IDE (Codeium) 플랫폼별 경로
+  - 일반적인 문제에 대한 Troubleshooting 섹션 추가
+  - 잘못된 파일 경로 참조 수정 (.claude.json → mcp.json)
+  - 영어-한글 내용 완벽 일치 보장
+- **코드 품질**: 테스트 스크립트의 모든 TypeScript lint 경고 제거
+  - 적절한 타입 정의 추가 (TelegramResult, McpTool 등)
+  - scripts/의 모든 `any` 타입을 특정 타입으로 교체
+  - 사용되지 않는 변수 경고 수정
+
+---
+
 ## [0.1.7] - 2025-11-06
 
 ### Added

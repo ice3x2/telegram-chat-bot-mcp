@@ -1,15 +1,7 @@
 import { sendTelegramMarkdown } from '../src/tools/sendTelegramMarkdown.js';
+import { getTestCredentials, runTest } from './test-helpers.js';
 
-async function test() {
-  const botToken = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
-
-  if (!botToken || !chatId) {
-    console.error('❌ TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID must be set');
-    process.exit(1);
-  }
-
-  const testMarkdown = `# 🚀 Telegram Markdown Test
+const testMarkdown = `# 🚀 Telegram Markdown Test
 
 ## Features
 - **Markdown** support
@@ -31,21 +23,19 @@ npm run build
   - Subitem 2.2
 `;
 
-  console.log('🧪 Testing Telegram Markdown conversion...\n');
+async function test() {
+  const { botToken, chatId } = getTestCredentials();
 
-  try {
+  await runTest('Telegram Markdown conversion', async () => {
     const result = await sendTelegramMarkdown(
       { markdown: testMarkdown, fallbackToText: true },
       botToken,
       chatId
     );
 
-    console.log('✅ Success!');
     console.log(JSON.stringify(result, null, 2));
-  } catch (error) {
-    console.error('❌ Failed:', error);
-    process.exit(1);
-  }
+    return result;
+  });
 }
 
 test();

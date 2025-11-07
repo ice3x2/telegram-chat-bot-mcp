@@ -109,21 +109,32 @@ function blockquoteToHTML(token: any): string {
 /**
  * Convert table token to HTML (render as preformatted text)
  * Telegram doesn't support HTML tables, so render as a code block to preserve layout
+ *
+ * Marked parses table cells as objects: { text: string, tokens: [...], align?: string, header?: boolean }
+ * We need to extract the text property from each cell object
  */
 function tableToHTML(token: any): string {
-  // `token` structure from marked table: { header: string[], rows: string[][] }
+  // `token` structure from marked table: { header: object[], rows: object[][] }
   const header = token.header || [];
   const rows = token.rows || [];
 
   // Build lines with pipe separators to preserve table structure
   const lines: string[] = [];
   if (header.length > 0) {
-    lines.push('| ' + header.join(' | ') + ' |');
+    // Extract text from header cell objects: { text: "Name", tokens: [...], ... }
+    const headerTexts = header.map((cell: any) => {
+      return typeof cell === 'string' ? cell : (cell.text || '');
+    });
+    lines.push('| ' + headerTexts.join(' | ') + ' |');
     lines.push('|' + header.map(() => '---').join('|') + '|');
   }
 
   for (const row of rows) {
-    lines.push('| ' + row.join(' | ') + ' |');
+    // Extract text from each cell object in the row: { text: "Alice", tokens: [...], ... }
+    const rowTexts = row.map((cell: any) => {
+      return typeof cell === 'string' ? cell : (cell.text || '');
+    });
+    lines.push('| ' + rowTexts.join(' | ') + ' |');
   }
 
   const text = lines.join('\n');

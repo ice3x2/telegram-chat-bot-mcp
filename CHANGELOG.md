@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.11] - 2025-11-08
+
+### Fixed
+- **Markdown table rendering bug fix**: Fixed `[object object]` appearing in table cells
+  - Root cause: Marked library parses cells as objects { text, tokens, align, header }
+  - Extract text property from each cell object
+  - Support both string and object cell formats for forward compatibility
+
+### Added
+- New test scripts:
+  - `test-marked-table-debug.ts`: Debug script to analyze Marked library table parsing
+  - `test-table-conversion.ts`: Comprehensive table markdown-to-HTML conversion tests
+    - Basic tables, tables with headings, multi-column tables, special characters
+- npm test script:
+  - `npm run test:table`: Run table conversion tests
+
+### 수정됨
+- **마크다운 테이블 렌더링 버그 수정**: 테이블 셀에 `[object object]`가 나오는 문제 수정
+  - 원인: Marked 라이브러리가 셀을 { text, tokens, align, header } 객체로 파싱
+  - 각 셀 객체에서 text 속성 추출
+  - 문자열 및 객체 셀 형식 모두 지원 (향후 호환성)
+
+### 추가됨
+- 새로운 테스트 스크립트:
+  - `test-marked-table-debug.ts`: Marked 라이브러리 테이블 파싱 분석 스크립트
+  - `test-table-conversion.ts`: 종합 마크다운-HTML 변환 테스트
+    - 기본 테이블, 제목 있는 테이블, 다중 열 테이블, 특수문자 포함
+- npm 테스트 스크립트:
+  - `npm run test:table`: 테이블 변환 테스트 실행
+
 ## [0.1.10] - 2025-11-08
 
 ### Fixed
@@ -13,19 +43,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Check if directory exists before attempting to read files
   - Improve error handling to prevent app crash on log cleanup failure
   - Only log errors to console, allow app to continue operation
-- **Markdown table rendering bug fix**: Fixed `[object object]` appearing in table cells
-  - Extract text property from cell objects (Marked parses cells as { text, tokens, align, header })
-  - Support both string and object cell formats for forward compatibility
-  - Add comprehensive table conversion tests with various formats
 
 ### Added
 - New test scripts:
   - `test-clean-old-logs.ts`: Test cleanOldLogs() with various edge cases
-  - `test-marked-table-debug.ts`: Debug script to analyze Marked library table parsing
-  - `test-table-conversion.ts`: Test table markdown-to-HTML conversion with multiple table types
 - npm test scripts:
   - `npm run test:clean:logs`: Run log cleanup tests
-  - `npm run test:table`: Run table conversion tests
 
 ### 수정됨
 - **Logger cleanOldLogs() 버그 수정**: 로그 디렉토리가 빈 문자열일 때 ENOENT 에러 수정
@@ -33,19 +56,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - 파일을 읽기 전에 디렉토리 존재 여부 확인
   - 로그 정리 실패 시 앱이 죽지 않도록 에러 처리 개선
   - 에러는 콘솔에만 로깅하고 앱은 계속 실행
-- **마크다운 테이블 렌더링 버그 수정**: 테이블 셀에 `[object object]`가 나오는 문제 수정
-  - 셀 객체에서 text 속성 추출 (Marked는 셀을 { text, tokens, align, header } 형태로 파싱)
-  - 문자열 및 객체 셀 형식 모두 지원 (향후 호환성)
-  - 다양한 테이블 형식을 포함한 종합 변환 테스트 추가
 
 ### 추가됨
 - 새로운 테스트 스크립트:
   - `test-clean-old-logs.ts`: 다양한 엣지 케이스에서 cleanOldLogs() 테스트
-  - `test-marked-table-debug.ts`: Marked 라이브러리 테이블 파싱 분석 스크립트
-  - `test-table-conversion.ts`: 다양한 테이블 유형으로 마크다운-HTML 변환 테스트
 - npm 테스트 스크립트:
   - `npm run test:clean:logs`: 로그 정리 테스트 실행
-  - `npm run test:table`: 테이블 변환 테스트 실행
 
 ## [0.1.9] - 2025-11-08
 

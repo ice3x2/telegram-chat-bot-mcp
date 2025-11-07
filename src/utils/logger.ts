@@ -196,7 +196,19 @@ export class Logger {
    */
   public cleanOldLogs(): void {
     try {
-      const files = fs.readdirSync(this.config.dir);
+      // logDir이 빈 문자열이면 실제 로그 경로로 설정
+      let logDir = this.config.dir;
+      if (!logDir) {
+        const homeDir = process.env.HOME || process.env.USERPROFILE || '.';
+        logDir = path.join(homeDir, '.telegram-mcp-logs');
+      }
+
+      // 디렉토리가 없으면 정리할 것이 없음
+      if (!fs.existsSync(logDir)) {
+        return;
+      }
+
+      const files = fs.readdirSync(logDir);
       const now = Date.now();
       const maxAge = this.config.retentionDays * 24 * 60 * 60 * 1000; // 밀리초
 
@@ -204,7 +216,7 @@ export class Logger {
 
       files.forEach((file) => {
         if (file.endsWith('.log')) {
-          const filePath = path.join(this.config.dir, file);
+          const filePath = path.join(logDir, file);
           const stats = fs.statSync(filePath);
           const age = now - stats.mtimeMs;
 
@@ -222,9 +234,11 @@ export class Logger {
         });
       }
     } catch (error) {
-      this.error('logCleaner', 'send_failed' as LogEvent, {
-        error: error instanceof Error ? error.message : String(error),
-      });
+      // 로그 정리 실패해도 앱이 죽지 않도록 에러만 로깅하고 계속 진행
+      console.error(
+        '로그 정리 중 오류 발생 (무시됨):',
+        error instanceof Error ? error.message : String(error)
+      );
     }
   }
 }

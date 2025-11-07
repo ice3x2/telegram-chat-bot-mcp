@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.10] - 2025-11-08
+
+### Fixed
+- **Logger cleanOldLogs() bug fix**: Fixed ENOENT error when log directory is empty string
+  - Add fallback to use home directory path when logDir is empty
+  - Check if directory exists before attempting to read files
+  - Improve error handling to prevent app crash on log cleanup failure
+  - Only log errors to console, allow app to continue operation
+
+### 수정됨
+- **Logger cleanOldLogs() 버그 수정**: 로그 디렉토리가 빈 문자열일 때 ENOENT 에러 수정
+  - logDir이 비어있을 때 홈 디렉토리 경로 사용
+  - 파일을 읽기 전에 디렉토리 존재 여부 확인
+  - 로그 정리 실패 시 앱이 죽지 않도록 에러 처리 개선
+  - 에러는 콘솔에만 로깅하고 앱은 계속 실행
+
 ## [0.1.9] - 2025-11-08
 
 ### Added

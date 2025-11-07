@@ -1,6 +1,6 @@
 {
   "name": "telegram-chat-bot-mcp",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "MCP server for Telegram Bot API with Markdown support",
   "type": "module",
   "main": "dist/index.js",
@@ -27,7 +27,8 @@
     "test": "npm run build && echo 'Build successful - MCP server ready'",
     "test:mcp:server": "tsx scripts/test-mcp-server.ts",
     "test:telegram:text": "tsx scripts/test-telegram-text.ts",
-    "test:telegram:markdown": "tsx scripts/test-telegram-markdown.ts"
+    "test:telegram:markdown": "tsx scripts/test-telegram-markdown.ts",
+    "test:clean:logs": "npm run build && tsx scripts/test-clean-old-logs.ts"
   },
   "keywords": [
     "mcp",

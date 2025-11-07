@@ -33,8 +33,25 @@ export class Logger {
    * 로그 디렉토리 생성
    */
   private ensureLogDir(): void {
-    if (!fs.existsSync(this.config.dir)) {
-      fs.mkdirSync(this.config.dir, { recursive: true });
+    try {
+      // 사용자 홈 디렉토리 기본값 설정
+      if (!this.config.dir || this.config.dir === './logs') {
+        const homeDir = process.env.HOME || process.env.USERPROFILE || '.';
+        this.config.dir = path.join(homeDir, '.telegram-mcp-logs');
+      }
+
+      if (!fs.existsSync(this.config.dir)) {
+        fs.mkdirSync(this.config.dir, { recursive: true });
+      }
+    } catch (error) {
+      console.error(
+        '로그 디렉토리 생성 실패, 콘솔로만 출력합니다:',
+        error instanceof Error ? error.message : String(error)
+      );
+
+      // 폴백: 콘솔 로그만 사용
+      this.config.dir = '';
+      this.config.enableConsole = true;
     }
   }
 
@@ -66,15 +83,24 @@ export class Logger {
 
     const logLine = JSON.stringify(entry) + '\n';
 
-    // 일반 로그 파일에 작성
-    fs.appendFileSync(this.getLogFilename(false), logLine, 'utf-8');
+    // 로그 디렉토리가 설정된 경우만 파일에 작성
+    if (this.config.dir) {
+      try {
+        fs.appendFileSync(this.getLogFilename(false), logLine, 'utf-8');
 
-    // 에러 로그는 별도 파일에도 작성
-    if (entry.level === 'ERROR') {
-      fs.appendFileSync(this.getLogFilename(true), logLine, 'utf-8');
+        // 에러 로그는 별도 파일에도 작성
+        if (entry.level === 'ERROR') {
+          fs.appendFileSync(this.getLogFilename(true), logLine, 'utf-8');
+        }
+      } catch (error) {
+        console.error(
+          '로그 파일 작성 실패:',
+          error instanceof Error ? error.message : String(error)
+        );
+      }
     }
 
-    // 콘솔 출력
+    // 항상 콘솔 출력
     if (this.config.enableConsole) {
       const timestamp = new Date(entry.timestamp).toISOString();
       const color = this.getLogColor(entry.level);

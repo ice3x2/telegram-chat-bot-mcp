@@ -5,6 +5,56 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.9] - 2025-11-08
+
+### Added
+- Comprehensive logger resilience test (`test-logger-resilience.ts`)
+  - Verify logger doesn't crash with read-only directories
+  - Verify automatic directory creation for log paths
+  - Verify safe operation with missing environment variables
+
+### Fixed
+- **Logger Error Handling**: Improved robustness in production environments
+  - Implement try-catch in `ensureLogDir()` for safe directory creation
+  - Use user home directory as fallback location (~/.telegram-mcp-logs)
+  - Add console fallback when file writing fails (no process crash)
+  - Handle missing LOG_DIR environment variable gracefully
+  - Ensure no log loss with multi-layer error recovery
+- **Security**: Remove all hardcoded credentials from git history
+  - Use git-filter-repo to remove exposed bot token from all 31 commits
+  - Replace with PLACEHOLDER_BOT_TOKEN in historical commits
+  - Strengthen .gitignore to prevent future credential leaks
+
+### Changed
+- **Documentation**: Enhanced security best practices
+  - Add environment variable setup instructions for safe deployment
+  - Document .env file usage for local development
+
+### 추가됨
+- 종합 로거 복원력 테스트 (`test-logger-resilience.ts`)
+  - 읽기 전용 디렉토리에서 로거가 크래시하지 않는지 확인
+  - 로그 경로 자동 생성 확인
+  - 환경변수 누락 상태에서 안전한 동작 확인
+
+### 수정됨
+- **Logger 에러 처리**: 프로덕션 환경에서의 견고성 개선
+  - `ensureLogDir()`에 try-catch 추가로 안전한 디렉토리 생성
+  - 사용자 홈 디렉토리를 폴백 위치로 사용 (~/.telegram-mcp-logs)
+  - 파일 쓰기 실패 시 콘솔로 폴백 (프로세스 크래시 없음)
+  - LOG_DIR 환경변수 누락 상태 안전하게 처리
+  - 다중 레이어 에러 복구로 로그 손실 없음
+- **보안**: git 히스토리에서 모든 하드코딩된 자격증명 제거
+  - git-filter-repo를 사용하여 모든 31개 커밋에서 노출된 봇 토큰 제거
+  - 히스토리 커밋에서 PLACEHOLDER_BOT_TOKEN으로 대체
+  - .gitignore 강화로 향후 자격증명 누출 방지
+
+### 변경됨
+- **문서화**: 향상된 보안 모범 사례
+  - 안전한 배포를 위한 환경변수 설정 지침 추가
+  - 로컬 개발을 위한 .env 파일 사용 문서화
+
+---
+
 ## [0.1.8] - 2025-11-06
 
 ### Changed

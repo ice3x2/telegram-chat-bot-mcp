@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.12] - 2025-11-13
+
+### Fixed
+- **Logger directory permission handling**: Improved fallback mechanism for restricted environments (IDE, Docker, etc.)
+  - First attempt: HOME/.telegram-mcp-logs or LOG_DIR environment variable
+  - First fallback: Windows C:\Temp or Unix /tmp
+  - Second fallback: Console logging only (no process crash)
+  - Fixes EPERM errors in restricted environments like IntelliJ IDEA, PyCharm, Docker containers
+
+### Added
+- New test script:
+  - `test-logger-fallback.ts`: Test logger fallback mechanisms for permission-restricted directories
+- npm test script:
+  - `npm run test:logger:fallback`: Run logger fallback mechanism tests
+
+### 수정됨
+- **로거 디렉토리 권한 처리 개선**: 제한된 환경(IDE, Docker 등)에서의 폴백 메커니즘 개선
+  - 첫 번째 시도: HOME/.telegram-mcp-logs 또는 LOG_DIR 환경변수
+  - 첫 번째 폴백: Windows C:\Temp 또는 Unix /tmp
+  - 두 번째 폴백: 콘솔 로깅만 사용 (프로세스 크래시 없음)
+  - IntelliJ IDEA, PyCharm, Docker 컨테이너 등의 제한된 환경에서 EPERM 에러 해결
+
+### 추가됨
+- 새로운 테스트 스크립트:
+  - `test-logger-fallback.ts`: 권한 제한 디렉토리에서의 로거 폴백 메커니즘 테스트
+- npm 테스트 스크립트:
+  - `npm run test:logger:fallback`: 로거 폴백 메커니즘 테스트 실행
+
 ## [0.1.11] - 2025-11-08
 
 ### Fixed

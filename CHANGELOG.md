@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.13] - 2025-11-13
+
+### Changed
+- **Logging architecture refactor**: Removed file-based logging entirely in favor of console-only output
+  - Eliminates race conditions from multiple `setInterval` calls on reconnect
+  - Fixes "works once, fails once" pattern in CLI reconnect operations
+  - Improves compatibility with restricted environments (IDE, Docker, serverless)
+  - Logger now outputs only to console/stderr (captured by IDE and container runtimes)
+
+### Removed
+- File logging system (`logger.ts` now console-only)
+- Log cleanup scheduler (`logCleaner.ts` converted to no-op functions)
+- All file I/O operations in logger (fs.mkdirSync, fs.appendFileSync)
+- Fallback directory creation logic (no longer needed)
+
+### Added
+- Graceful shutdown handlers in `index.ts` for SIGTERM, SIGINT, uncaughtException, unhandledRejection
+
 ## [0.1.12] - 2025-11-13
 
 ### Fixed

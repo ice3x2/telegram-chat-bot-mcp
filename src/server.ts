@@ -6,7 +6,6 @@ import { sendTelegramMarkdown } from './tools/sendTelegramMarkdown.js';
 import { sendTelegramWithButtons } from './tools/sendTelegramWithButtons.js';
 import { sendTelegramPhoto } from './tools/sendTelegramPhoto.js';
 import { markdownToTelegramHTML } from './tools/markdownToTelegram.js';
-import { startLogCleanupScheduler } from './utils/logCleaner.js';
 import { logger } from './utils/logger.js';
 
 /**
@@ -103,9 +102,6 @@ export async function startServer() {
   }
 
   logger.info('server', 'server_starting', { chatId: telegramChatId });
-
-  // Start log cleanup scheduler (runs every 24 hours)
-  startLogCleanupScheduler(24);
 
   const server = new McpServer({
     name: 'telegram-bot-mcp',

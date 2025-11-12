@@ -1,6 +1,6 @@
 {
   "name": "telegram-chat-bot-mcp",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "description": "MCP server for Telegram Bot API with Markdown support",
   "type": "module",
   "main": "dist/index.js",

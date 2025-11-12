@@ -1,15 +1,17 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import { LogLevel, LogEntry, LogConfig, LogEvent } from '../types/log.js';
+import { LogLevel, LogEntry, LogEvent } from '../types/log.js';
 
 /**
- * 간단한 파일 기반 로거
- * - 일별 로그 파일 생성
- * - 30일 자동 정리
- * - JSON 형식 로그
+ * 간단한 콘솔 로거
+ * - 파일 로그 제거 (MCP 서버 환경에서는 불필요)
+ * - 콘솔 출력만 사용
+ * - IDE의 로그 패널에서 자동 캡처됨
  */
 export class Logger {
-  private config: LogConfig;
+  private config: {
+    level: LogLevel;
+    enableConsole: boolean;
+  };
+
   private logLevelPriority: Record<LogLevel, number> = {
     DEBUG: 0,
     INFO: 1,
@@ -17,73 +19,12 @@ export class Logger {
     ERROR: 3,
   };
 
-  constructor(config?: Partial<LogConfig>) {
+  constructor(config?: Partial<typeof Logger.prototype.config>) {
     this.config = {
       level: (process.env.LOG_LEVEL as LogLevel) || 'INFO',
-      dir: process.env.LOG_DIR || './logs',
-      retentionDays: parseInt(process.env.LOG_RETENTION_DAYS || '30', 10),
       enableConsole: process.env.LOG_ENABLE_CONSOLE !== 'false',
       ...config,
     };
-
-    this.ensureLogDir();
-  }
-
-  /**
-   * 로그 디렉토리 생성
-   * 다양한 폴백 전략:
-   * 1. 환경변수 LOG_DIR 사용
-   * 2. 홈 디렉토리의 .telegram-mcp-logs 사용
-   * 3. Windows: C:\Temp, Unix: /tmp 사용
-   * 4. 모두 실패하면 콘솔 로그만 사용
-   */
-  private ensureLogDir(): void {
-    try {
-      // 첫 번째 시도: 기본 경로 설정
-      if (!this.config.dir || this.config.dir === './logs') {
-        const homeDir = process.env.HOME || process.env.USERPROFILE || '.';
-        this.config.dir = path.join(homeDir, '.telegram-mcp-logs');
-      }
-
-      // 디렉토리 생성 시도
-      if (!fs.existsSync(this.config.dir)) {
-        fs.mkdirSync(this.config.dir, { recursive: true });
-      }
-    } catch (error) {
-      // 첫 번째 폴백: Windows는 C:\Temp, 그 외는 /tmp 사용
-      try {
-        const isWindows = process.platform === 'win32';
-        const tempBase = isWindows ? 'C:\\Temp' : '/tmp';
-        const fallbackDir = path.join(tempBase, 'telegram-mcp-logs');
-
-        if (!fs.existsSync(fallbackDir)) {
-          fs.mkdirSync(fallbackDir, { recursive: true });
-        }
-
-        this.config.dir = fallbackDir;
-        console.warn(
-          `[로거] 기본 로그 디렉토리 생성 실패, 임시 디렉토리 사용: ${fallbackDir}`
-        );
-      } catch (fallbackError) {
-        // 두 번째 폴백: 콘솔 로그만 사용
-        console.error(
-          '[로거] 모든 로그 디렉토리 생성 실패, 콘솔 로그만 사용합니다:',
-          fallbackError instanceof Error ? fallbackError.message : String(fallbackError)
-        );
-
-        this.config.dir = '';
-        this.config.enableConsole = true;
-      }
-    }
-  }
-
-  /**
-   * 현재 날짜 기반 로그 파일명 생성
-   */
-  private getLogFilename(isError: boolean = false): string {
-    const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-    const prefix = isError ? 'errors' : 'app';
-    return path.join(this.config.dir, `${prefix}-${date}.log`);
   }
 
   /**
@@ -96,40 +37,26 @@ export class Logger {
   }
 
   /**
-   * 로그 엔트리 작성
+   * 콘솔에 로그 출력
    */
   private writeLog(entry: LogEntry): void {
     if (!this.shouldLog(entry.level)) {
       return;
     }
 
-    const logLine = JSON.stringify(entry) + '\n';
-
-    // 로그 디렉토리가 설정된 경우만 파일에 작성
-    if (this.config.dir) {
-      try {
-        fs.appendFileSync(this.getLogFilename(false), logLine, 'utf-8');
-
-        // 에러 로그는 별도 파일에도 작성
-        if (entry.level === 'ERROR') {
-          fs.appendFileSync(this.getLogFilename(true), logLine, 'utf-8');
-        }
-      } catch (error) {
-        console.error(
-          '로그 파일 작성 실패:',
-          error instanceof Error ? error.message : String(error)
-        );
-      }
-    }
-
-    // 항상 콘솔 출력
     if (this.config.enableConsole) {
       const timestamp = new Date(entry.timestamp).toISOString();
       const color = this.getLogColor(entry.level);
-      console.log(
-        `${color}[${timestamp}] [${entry.level}] [${entry.module}] ${entry.event}${this.resetColor()}`,
-        entry
-      );
+      const logMessage = `${color}[${timestamp}] [${entry.level}] [${entry.module}] ${entry.event}${this.resetColor()}`;
+
+      // 추가 데이터가 있으면 JSON으로 함께 출력
+      const { timestamp: _ts, level: _lvl, module: _mod, event: _evt, ...data } = entry;
+
+      if (Object.keys(data).length > 0) {
+        console.log(logMessage, JSON.stringify(data));
+      } else {
+        console.log(logMessage);
+      }
     }
   }
 
@@ -214,54 +141,11 @@ export class Logger {
   }
 
   /**
-   * 오래된 로그 파일 정리
+   * 파일 로그 정리 (더 이상 사용 안 함)
+   * MCP 서버는 파일 로그를 사용하지 않으므로 No-op
    */
   public cleanOldLogs(): void {
-    try {
-      // logDir이 빈 문자열이면 실제 로그 경로로 설정
-      let logDir = this.config.dir;
-      if (!logDir) {
-        const homeDir = process.env.HOME || process.env.USERPROFILE || '.';
-        logDir = path.join(homeDir, '.telegram-mcp-logs');
-      }
-
-      // 디렉토리가 없으면 정리할 것이 없음
-      if (!fs.existsSync(logDir)) {
-        return;
-      }
-
-      const files = fs.readdirSync(logDir);
-      const now = Date.now();
-      const maxAge = this.config.retentionDays * 24 * 60 * 60 * 1000; // 밀리초
-
-      let deletedCount = 0;
-
-      files.forEach((file) => {
-        if (file.endsWith('.log')) {
-          const filePath = path.join(logDir, file);
-          const stats = fs.statSync(filePath);
-          const age = now - stats.mtimeMs;
-
-          if (age > maxAge) {
-            fs.unlinkSync(filePath);
-            deletedCount++;
-          }
-        }
-      });
-
-      if (deletedCount > 0) {
-        this.info('logCleaner', 'message_sent' as LogEvent, {
-          deletedFiles: deletedCount,
-          retentionDays: this.config.retentionDays,
-        });
-      }
-    } catch (error) {
-      // 로그 정리 실패해도 앱이 죽지 않도록 에러만 로깅하고 계속 진행
-      console.error(
-        '로그 정리 중 오류 발생 (무시됨):',
-        error instanceof Error ? error.message : String(error)
-      );
-    }
+    // No-op: 파일 로그가 없음
   }
 }
 

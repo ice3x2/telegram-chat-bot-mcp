@@ -29,7 +29,8 @@
     "test:telegram:text": "tsx scripts/test-telegram-text.ts",
     "test:telegram:markdown": "tsx scripts/test-telegram-markdown.ts",
     "test:clean:logs": "npm run build && tsx scripts/test-clean-old-logs.ts",
-    "test:table": "npm run build && tsx scripts/test-table-conversion.ts"
+    "test:table": "npm run build && tsx scripts/test-table-conversion.ts",
+    "test:logger:fallback": "npm run build && tsx scripts/test-logger-fallback.ts"
   },
   "keywords": [
     "mcp",

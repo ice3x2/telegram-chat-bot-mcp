@@ -31,27 +31,49 @@ export class Logger {
 
   /**
    * 로그 디렉토리 생성
+   * 다양한 폴백 전략:
+   * 1. 환경변수 LOG_DIR 사용
+   * 2. 홈 디렉토리의 .telegram-mcp-logs 사용
+   * 3. Windows: C:\Temp, Unix: /tmp 사용
+   * 4. 모두 실패하면 콘솔 로그만 사용
    */
   private ensureLogDir(): void {
     try {
-      // 사용자 홈 디렉토리 기본값 설정
+      // 첫 번째 시도: 기본 경로 설정
       if (!this.config.dir || this.config.dir === './logs') {
         const homeDir = process.env.HOME || process.env.USERPROFILE || '.';
         this.config.dir = path.join(homeDir, '.telegram-mcp-logs');
       }
 
+      // 디렉토리 생성 시도
       if (!fs.existsSync(this.config.dir)) {
         fs.mkdirSync(this.config.dir, { recursive: true });
       }
     } catch (error) {
-      console.error(
-        '로그 디렉토리 생성 실패, 콘솔로만 출력합니다:',
-        error instanceof Error ? error.message : String(error)
-      );
+      // 첫 번째 폴백: Windows는 C:\Temp, 그 외는 /tmp 사용
+      try {
+        const isWindows = process.platform === 'win32';
+        const tempBase = isWindows ? 'C:\\Temp' : '/tmp';
+        const fallbackDir = path.join(tempBase, 'telegram-mcp-logs');
 
-      // 폴백: 콘솔 로그만 사용
-      this.config.dir = '';
-      this.config.enableConsole = true;
+        if (!fs.existsSync(fallbackDir)) {
+          fs.mkdirSync(fallbackDir, { recursive: true });
+        }
+
+        this.config.dir = fallbackDir;
+        console.warn(
+          `[로거] 기본 로그 디렉토리 생성 실패, 임시 디렉토리 사용: ${fallbackDir}`
+        );
+      } catch (fallbackError) {
+        // 두 번째 폴백: 콘솔 로그만 사용
+        console.error(
+          '[로거] 모든 로그 디렉토리 생성 실패, 콘솔 로그만 사용합니다:',
+          fallbackError instanceof Error ? fallbackError.message : String(fallbackError)
+        );
+
+        this.config.dir = '';
+        this.config.enableConsole = true;
+      }
     }
   }
 

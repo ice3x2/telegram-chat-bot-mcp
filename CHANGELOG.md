@@ -12,28 +12,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Root cause: Marked library parses cells as objects { text, tokens, align, header }
   - Extract text property from each cell object
   - Support both string and object cell formats for forward compatibility
+- **Logger directory permission handling**: Improved fallback mechanism for restricted environments (IDE, Docker, etc.)
+  - First attempt: HOME/.telegram-mcp-logs or LOG_DIR environment variable
+  - First fallback: Windows C:\Temp or Unix /tmp
+  - Second fallback: Console logging only (no process crash)
+  - Fixes EPERM errors in restricted environments like IntelliJ IDEA, PyCharm, Docker containers
 
 ### Added
 - New test scripts:
   - `test-marked-table-debug.ts`: Debug script to analyze Marked library table parsing
   - `test-table-conversion.ts`: Comprehensive table markdown-to-HTML conversion tests
     - Basic tables, tables with headings, multi-column tables, special characters
-- npm test script:
+  - `test-logger-fallback.ts`: Test logger fallback mechanisms for permission-restricted directories
+- npm test scripts:
   - `npm run test:table`: Run table conversion tests
+  - `npm run test:logger:fallback`: Run logger fallback mechanism tests
 
 ### 수정됨
 - **마크다운 테이블 렌더링 버그 수정**: 테이블 셀에 `[object object]`가 나오는 문제 수정
   - 원인: Marked 라이브러리가 셀을 { text, tokens, align, header } 객체로 파싱
   - 각 셀 객체에서 text 속성 추출
   - 문자열 및 객체 셀 형식 모두 지원 (향후 호환성)
+- **로거 디렉토리 권한 처리 개선**: 제한된 환경(IDE, Docker 등)에서의 폴백 메커니즘 개선
+  - 첫 번째 시도: HOME/.telegram-mcp-logs 또는 LOG_DIR 환경변수
+  - 첫 번째 폴백: Windows C:\Temp 또는 Unix /tmp
+  - 두 번째 폴백: 콘솔 로깅만 사용 (프로세스 크래시 없음)
+  - IntelliJ IDEA, PyCharm, Docker 컨테이너 등의 제한된 환경에서 EPERM 에러 해결
 
 ### 추가됨
 - 새로운 테스트 스크립트:
   - `test-marked-table-debug.ts`: Marked 라이브러리 테이블 파싱 분석 스크립트
   - `test-table-conversion.ts`: 종합 마크다운-HTML 변환 테스트
     - 기본 테이블, 제목 있는 테이블, 다중 열 테이블, 특수문자 포함
+  - `test-logger-fallback.ts`: 권한 제한 디렉토리에서의 로거 폴백 메커니즘 테스트
 - npm 테스트 스크립트:
   - `npm run test:table`: 테이블 변환 테스트 실행
+  - `npm run test:logger:fallback`: 로거 폴백 메커니즘 테스트 실행
 
 ## [0.1.10] - 2025-11-08
 

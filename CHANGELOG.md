@@ -5,6 +5,86 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.14] - 2025-11-13
+
+### Added
+- **Markdown auto-splitting feature**: Intelligent document splitting for Telegram message size limits
+  - New utility: `src/utils/markdownSplitter.ts` with core splitting logic
+  - Measures actual HTML size after markdown-to-HTML conversion (accounts for entity escaping overhead)
+  - Smart split-point detection: prefer `---` (horizontal rules) → `#` (headers) → `\n` (newlines)
+  - Configurable search range (±30% of midpoint) to find natural semantic boundaries
+  - Automatic page numbering for split chunks (format: `[1/5]`, `[2/5]`, etc.)
+  - Sequential message sending with 1-second delays between chunks to respect Telegram rate limiting
+- **HTML escaping enhancements**: Proper handling of special characters in markdown content
+  - Escape `&`, `<`, `>`, `"`, `'` characters before wrapping in HTML tags
+  - Fixes "Unmatched end tag" errors when markdown contains special characters in code blocks
+  - Applied in `markdownToTelegram.ts` using callback-based regex replacements
+- **Enhanced message processing logs**: New LogEvent types for tracking markdown splitting
+  - `message_processing`: When large markdown splitting begins
+  - `chunk_sent`: Individual chunk sent successfully
+  - `chunk_send_failed`: Individual chunk failed
+  - `fallback_to_text`: When HTML parsing fails and plain text is used
+
+### Fixed
+- **Over-splitting issue**: Documents under Telegram's 4096 character limit were unnecessarily split into many chunks
+  - Root cause: Using estimated HTML size (markdown × 2) was inaccurate due to entity escaping (2x-3x overhead)
+  - Solution: Measure actual HTML size by converting markdown to HTML first via `measureActualHtmlSize()`
+  - Result: 21KB document reduced from 44 chunks → 17 chunks (reasonable split ratio)
+  - Threshold: 4050 characters (4096 - 46 safety margin)
+- **HTML parsing failures**: Improved error handling when markdown-to-HTML conversion fails
+  - Try-catch fallback to plain text conversion
+  - Graceful degradation instead of message send failure
+
+### Changed
+- **Logging system consolidation**: All logging now consolidated to console output
+  - Part of v0.1.13 migration (file → console logging)
+  - Updated all tools to use console-based output format
+  - Removed all file I/O operations in logging calls
+
+### Removed
+- Deleted unnecessary markdown report files: ANALYSIS_REPORT.md, QUICK_FIX_SUMMARY.md, REMAINING_RISKS.md
+- Deleted unnecessary test scripts: 9 integration/markdown/test files
+- Cleaned up temporary log and test data
+
+### 추가됨
+- **마크다운 자동 분할 기능**: Telegram 메시지 크기 제한을 위한 지능형 문서 분할
+  - 새로운 유틸리티: `src/utils/markdownSplitter.ts` (핵심 분할 로직)
+  - 마크다운-HTML 변환 후 실제 HTML 크기 측정 (엔터티 이스케이프 오버헤드 고려)
+  - 스마트 분할 지점 감지: `---` (수평선) → `#` (헤더) → `\n` (줄바꿈)
+  - 자연스러운 시맨틱 경계를 찾기 위한 구성 가능한 검색 범위 (±30%)
+  - 분할된 청크에 자동 페이지 번호 표시 (`[1/5]`, `[2/5]` 등)
+  - 청크 간 1초 지연을 통한 순차 메시지 전송으로 Telegram 요청 제한 준수
+- **HTML 이스케이프 개선**: 마크다운 콘텐츠의 특수 문자 처리
+  - HTML 태그로 감싸기 전에 `&`, `<`, `>`, `"`, `'` 문자 이스케이프
+  - 마크다운에 코드 블록의 특수 문자가 포함될 때 "Unmatched end tag" 에러 수정
+  - `markdownToTelegram.ts`에서 콜백 기반 정규식 교체로 적용
+- **향상된 메시지 처리 로그**: 마크다운 분할 추적을 위한 새로운 LogEvent 타입
+  - `message_processing`: 큰 마크다운 분할이 시작될 때
+  - `chunk_sent`: 개별 청크 전송 성공
+  - `chunk_send_failed`: 개별 청크 전송 실패
+  - `fallback_to_text`: HTML 파싱 실패 시 일반 텍스트 사용
+
+### 수정됨
+- **과다 분할 이슈**: Telegram의 4096 문자 제한 미만의 문서가 불필요하게 여러 청크로 분할됨
+  - 원인: 추정 HTML 크기(마크다운 × 2) 부정확 (엔터티 이스케이프로 인해 2배-3배 오버헤드)
+  - 해결: `measureActualHtmlSize()`를 통해 마크다운을 HTML로 변환하여 실제 크기 측정
+  - 결과: 21KB 문서가 44개 청크 → 17개 청크로 감소 (합리적인 분할 비율)
+  - 임계값: 4050 문자 (4096 - 46 안전 마진)
+- **HTML 파싱 실패**: 마크다운-HTML 변환 실패 시 에러 처리 개선
+  - Try-catch 폴백으로 일반 텍스트 변환
+  - 메시지 전송 실패 대신 우아한 성능 저하
+
+### 변경됨
+- **로깅 시스템 통합**: 모든 로깅이 콘솔 출력으로 통합됨
+  - v0.1.13 마이그레이션의 일부 (파일 → 콘솔 로깅)
+  - 콘솔 기반 출력 형식을 사용하도록 모든 도구 업데이트
+  - 로깅 호출에서 모든 파일 I/O 작업 제거
+
+### 제거됨
+- 불필요한 마크다운 보고서 파일 삭제: ANALYSIS_REPORT.md, QUICK_FIX_SUMMARY.md, REMAINING_RISKS.md
+- 불필요한 테스트 스크립트 삭제: 9개 통합/마크다운/테스트 파일
+- 임시 로그 및 테스트 데이터 정리
+
 ## [0.1.13] - 2025-11-13
 
 ### Changed

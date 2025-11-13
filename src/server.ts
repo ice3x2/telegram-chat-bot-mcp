@@ -109,30 +109,32 @@ export async function startServer() {
   });
 
   // Register Telegram tools
+  // Note: MCP SDK handler interface is complex with additional metadata fields
+  // Using 'as any' for type compatibility with MCP SDK requirements
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sendTextHandler = (async ({ text }: { text: string }) => {
+  const sendTextHandler: any = async ({ text }: { text: string }) => {
     try {
       if (!telegramBotToken || !telegramChatId) {
         logger.error('server', 'send_failed', { error: 'Bot token and chat ID not configured' });
-        return { 
-          content: [{ type: 'text', text: 'Error: Bot token and chat ID are not configured' }], 
-          isError: true 
+        return {
+          content: [{ type: 'text', text: 'Error: Bot token and chat ID are not configured' }],
+          isError: true
         };
       }
       const result = await sendTelegramText({ text }, telegramBotToken, telegramChatId);
       const out = { success: true, messageId: result.message_id };
-      return { 
+      return {
         content: [{ type: 'text', text: JSON.stringify(out, null, 2) }]
       };
     } catch (err: unknown) {
       const e = err as Error;
       logger.error('server', 'send_failed', { error: e.message });
-      return { 
-        content: [{ type: 'text', text: `Error: ${e.message}` }], 
-        isError: true 
+      return {
+        content: [{ type: 'text', text: `Error: ${e.message}` }],
+        isError: true
       };
     }
-  }) as any;
+  };
 
   server.registerTool(
     'send_telegram_text',
@@ -147,13 +149,13 @@ export async function startServer() {
   );
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sendMarkdownHandler = (async ({ markdown, fallbackToText }: { markdown: string; fallbackToText?: boolean }) => {
+  const sendMarkdownHandler: any = async ({ markdown, fallbackToText }: { markdown: string; fallbackToText?: boolean }) => {
     try {
       if (!telegramBotToken || !telegramChatId) {
         logger.error('server', 'send_failed', { error: 'Bot token and chat ID not configured' });
-        return { 
-          content: [{ type: 'text', text: 'Error: Bot token and chat ID are not configured' }], 
-          isError: true 
+        return {
+          content: [{ type: 'text', text: 'Error: Bot token and chat ID are not configured' }],
+          isError: true
         };
       }
       const result = await sendTelegramMarkdown(
@@ -161,18 +163,18 @@ export async function startServer() {
         telegramBotToken,
         telegramChatId
       );
-      return { 
+      return {
         content: [{ type: 'text', text: JSON.stringify(result, null, 2) }]
       };
     } catch (err: unknown) {
       const e = err as Error;
       logger.error('server', 'send_failed', { error: e.message });
-      return { 
-        content: [{ type: 'text', text: `Error: ${e.message}` }], 
-        isError: true 
+      return {
+        content: [{ type: 'text', text: `Error: ${e.message}` }],
+        isError: true
       };
     }
-  }) as any;
+  };
 
   server.registerTool(
     'send_telegram_markdown',
@@ -188,9 +190,9 @@ export async function startServer() {
   );
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sendButtonsHandler = (async ({ text, buttons, parseMode }: {
+  const sendButtonsHandler: any = async ({ text, buttons, parseMode }: {
     text: string;
-    buttons: any[][];
+    buttons: Record<string, any>[][];
     parseMode?: 'HTML' | 'MarkdownV2';
   }) => {
     try {
@@ -202,7 +204,7 @@ export async function startServer() {
         };
       }
       const result = await sendTelegramWithButtons(
-        { text, buttons, parseMode },
+        { text, buttons: buttons as any, parseMode },
         telegramBotToken,
         telegramChatId
       );
@@ -217,7 +219,7 @@ export async function startServer() {
         isError: true
       };
     }
-  }) as any;
+  };
 
   server.registerTool(
     'send_telegram_with_buttons',
@@ -239,7 +241,7 @@ export async function startServer() {
   );
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const sendPhotoHandler = (async ({ photo, caption, parseMode }: {
+  const sendPhotoHandler: any = async ({ photo, caption, parseMode }: {
     photo: string;
     caption?: string;
     parseMode?: 'HTML' | 'MarkdownV2';
@@ -268,7 +270,7 @@ export async function startServer() {
         isError: true
       };
     }
-  }) as any;
+  };
 
   server.registerTool(
     'send_telegram_photo',
@@ -285,7 +287,7 @@ export async function startServer() {
   );
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const markdownConverter = (async ({ markdown }: { markdown: string }) => {
+  const markdownConverter: any = async ({ markdown }: { markdown: string }) => {
     try {
       const html = markdownToTelegramHTML(markdown);
       return {
@@ -299,7 +301,7 @@ export async function startServer() {
         isError: true
       };
     }
-  }) as any;
+  };
 
   server.registerTool(
     'markdown_to_telegram_html',

@@ -1,4 +1,4 @@
-import { telegramAxios } from '../utils/axiosConfig.js';
+import { getTelegramAxios, TELEGRAM_TEXT_TIMEOUT } from '../utils/axiosConfig.js';
 import { logger } from '../utils/logger.js';
 
 export interface SendTelegramTextParams {
@@ -36,7 +36,10 @@ export async function sendTelegramText(
   });
 
   try {
-    const response = await telegramAxios.post(url, payload);
+    const telegramAxios = getTelegramAxios();
+    const response = await telegramAxios.post(url, payload, {
+      timeout: TELEGRAM_TEXT_TIMEOUT
+    });
 
     if (!response.data.ok) {
       throw new Error(`Telegram API error: ${response.data.description}`);

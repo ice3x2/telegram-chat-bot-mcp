@@ -4,21 +4,25 @@
 export type LogLevel = 'DEBUG' | 'INFO' | 'WARN' | 'ERROR';
 
 /**
- * 로그 이벤트 타입
+ * 로그 이벤트 타입 - 실제 코드에서 사용되는 모든 이벤트 타입을 포함
  */
 export type LogEvent =
-  | 'message_sent'
-  | 'fallback_used'
-  | 'image_validation_failed'
-  | 'send_failed'
-  | 'conversion_failed'
-  | 'validation_failed'
-  | 'server_start_failed'
-  | 'invalid_webhook_url'
-  | 'server_starting'
-  | 'sending_message'
-  | 'markdown_parse_failed'
-  | 'env_check';
+  | 'env_check'                      // 환경 변수 검사
+  | 'server_starting'                // MCP 서버 시작
+  | 'server_start_failed'            // 서버 시작 실패
+  | 'sending_message'                // 메시지 전송 중
+  | 'message_sent'                   // 메시지 전송 성공
+  | 'send_failed'                    // 메시지 전송 실패
+  | 'fallback_used'                  // 폴백 기능 사용
+  | 'fallback_failed'                // 폴백 실패 (원본 및 폴백 모두 실패)
+  | 'markdown_parse_failed'          // 마크다운 파싱 실패
+  | 'conversion_failed'              // 형식 변환 실패
+  | 'image_validation_failed'        // 이미지 검증 실패
+  | 'validation_failed'              // 일반 검증 실패
+  | 'invalid_webhook_url'            // 유효하지 않은 웹훅 URL
+  | 'message_processing'             // 큰 메시지 분할 처리
+  | 'chunk_sent'                     // 분할된 청크 전송 완료
+  | 'chunk_send_failed'              // 분할된 청크 전송 실패
 
 /**
  * 로그 엔트리 기본 구조

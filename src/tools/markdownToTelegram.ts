@@ -143,32 +143,50 @@ function tableToHTML(token: any): string {
 
 /**
  * Process inline markdown: **bold**, *italic*, `code`, [link](url), ![alt](url)
+ * Properly escapes content within each markdown element
  */
 function processInlineMarkdown(text: string): string {
-  // **bold** → <b>bold</b>
-  text = text.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+  // First escape HTML in raw text (but we'll re-process specific patterns)
+  // Instead, process patterns and escape their content
 
-  // *italic* → <i>italic</i>
-  text = text.replace(/\*([^*]+)\*/g, '<i>$1</i>');
+  // `code` → <code>escaped_code</code> (escape first!)
+  text = text.replace(/`([^`]+)`/g, (match, code) => {
+    return `<code>${escapeHTML(code)}</code>`;
+  });
 
-  // `code` → <code>code</code>
-  text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+  // **bold** → <b>escaped_text</b> (escape the content)
+  text = text.replace(/\*\*([^*]+)\*\*/g, (match, bold) => {
+    return `<b>${escapeHTML(bold)}</b>`;
+  });
 
-  // [link](url) → <a href="url">link</a>
-  text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+  // *italic* → <i>escaped_text</i> (escape the content)
+  text = text.replace(/\*([^*]+)\*/g, (match, italic) => {
+    return `<i>${escapeHTML(italic)}</i>`;
+  });
 
-  // ![alt](url) → 🖼️ <a href="url">alt</a>
-  text = text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '🖼️ <a href="$2">$1</a>');
+  // [link](url) → <a href="url">link</a> (escape link text)
+  text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, linkText, url) => {
+    return `<a href="${escapeHTML(url)}">${escapeHTML(linkText)}</a>`;
+  });
+
+  // ![alt](url) → 🖼️ <a href="url">alt</a> (escape alt text and url)
+  text = text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, url) => {
+    return `🖼️ <a href="${escapeHTML(url)}">${escapeHTML(alt)}</a>`;
+  });
 
   return text;
 }
 
 /**
- * Escape HTML special characters
+ * Escape HTML special characters for Telegram
+ * Handles all special characters that could break HTML parsing
  */
 function escapeHTML(text: string): string {
+  // Order matters: & must be first to avoid double-escaping
   return text
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')  // Double quote
+    .replace(/'/g, '&#39;');  // Single quote / apostrophe
 }

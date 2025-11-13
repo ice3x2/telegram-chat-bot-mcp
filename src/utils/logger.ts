@@ -44,7 +44,11 @@ export class Logger {
       return;
     }
 
-    if (this.config.enableConsole) {
+    if (!this.config.enableConsole) {
+      return;
+    }
+
+    try {
       const timestamp = new Date(entry.timestamp).toISOString();
       const color = this.getLogColor(entry.level);
       const logMessage = `${color}[${timestamp}] [${entry.level}] [${entry.module}] ${entry.event}${this.resetColor()}`;
@@ -52,10 +56,29 @@ export class Logger {
       // 추가 데이터가 있으면 JSON으로 함께 출력
       const { timestamp: _ts, level: _lvl, module: _mod, event: _evt, ...data } = entry;
 
+      let dataStr = '';
       if (Object.keys(data).length > 0) {
-        console.log(logMessage, JSON.stringify(data));
+        try {
+          // JSON.stringify 실패 시 (순환 참조 등) 키만 표시
+          dataStr = JSON.stringify(data);
+        } catch {
+          // Handle circular references and serialization errors
+          const keys = Object.keys(data);
+          dataStr = `[Circular or Invalid Data] ${keys.join(', ')}`;
+        }
+      }
+
+      if (dataStr) {
+        console.log(logMessage, dataStr);
       } else {
         console.log(logMessage);
+      }
+    } catch (error) {
+      // Fallback: try to log at least the basic information
+      try {
+        console.error(`[LOGGER ERROR] ${entry.level}: ${entry.event}`);
+      } catch {
+        // Last resort: if even this fails, we can do nothing
       }
     }
   }

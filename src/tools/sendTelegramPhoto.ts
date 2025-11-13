@@ -1,4 +1,4 @@
-import { telegramAxios } from '../utils/axiosConfig.js';
+import { getTelegramAxios, TELEGRAM_PHOTO_TIMEOUT } from '../utils/axiosConfig.js';
 import { validateImageUrl } from '../utils/imageValidator.js';
 import { logger } from '../utils/logger.js';
 
@@ -66,8 +66,9 @@ export async function sendTelegramPhoto(
   });
 
   try {
+    const telegramAxios = getTelegramAxios();
     const response = await telegramAxios.post(url, payload, {
-      timeout: 15000  // Longer timeout for photo upload
+      timeout: TELEGRAM_PHOTO_TIMEOUT  // Configurable timeout for photo upload
     });
 
     if (!response.data.ok) {

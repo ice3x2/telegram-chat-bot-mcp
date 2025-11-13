@@ -1,4 +1,4 @@
-import { telegramAxios } from '../utils/axiosConfig.js';
+import { getTelegramAxios, TELEGRAM_BUTTONS_TIMEOUT } from '../utils/axiosConfig.js';
 import { InlineKeyboardButton, InlineKeyboardMarkup } from '../types/telegram.js';
 import { logger } from '../utils/logger.js';
 
@@ -69,7 +69,10 @@ export async function sendTelegramWithButtons(
   });
 
   try {
-    const response = await telegramAxios.post(url, payload);
+    const telegramAxios = getTelegramAxios();
+    const response = await telegramAxios.post(url, payload, {
+      timeout: TELEGRAM_BUTTONS_TIMEOUT
+    });
 
     if (!response.data.ok) {
       throw new Error(`Telegram API error: ${response.data.description}`);

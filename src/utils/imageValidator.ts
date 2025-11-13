@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { telegramAxios } from './axiosConfig.js';
+import { getImageValidatorAxios } from './axiosConfig.js';
 import { logger } from './logger.js';
 
 export interface ImageValidationResult {
@@ -25,7 +25,8 @@ export async function validateImageUrl(
   timeoutMs: number = 5000
 ): Promise<ImageValidationResult> {
   try {
-    const response = await telegramAxios.head(url, {
+    const imageValidator = getImageValidatorAxios();
+    const response = await imageValidator.head(url, {
       timeout: timeoutMs,
       validateStatus: (status) => status >= 200 && status < 300,
     });

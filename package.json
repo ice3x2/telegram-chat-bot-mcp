@@ -1,6 +1,6 @@
 {
   "name": "telegram-chat-bot-mcp",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "description": "MCP server for Telegram Bot API with Markdown support",
   "type": "module",
   "main": "dist/index.js",
@@ -53,7 +53,6 @@
   },
   "homepage": "https://github.com/ice3x2/telegram-chat-bot-mcp#readme",
   "dependencies": {
-    "@esbuild/linux-x64": "^0.25.12",
     "@modelcontextprotocol/sdk": "^1.20.0",
     "axios": "^1.0.0",
     "marked": "^16.4.1",

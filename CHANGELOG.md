@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.15] - 2025-11-13
+
+### Fixed
+- **Windows MCP platform compatibility issue**: Removed @esbuild/linux-x64 from dependencies
+  - Root cause: Linux-only binary package (@esbuild/linux-x64) was required in all environments
+  - Issue: npm EBADPLATFORM error when installing on Windows systems
+  - Impact: MCP server initialization failed in Windows-based IDEs (VS Code, Cursor, Copilot)
+  - Solution: Removed platform-specific dependency, allowing esbuild to handle platform detection
+  - Result: npm install now works seamlessly on both Windows and Linux environments
+  - Verification: Build successful (tsc), 314 packages audited, 0 vulnerabilities
+
+### 수정됨
+- **Windows MCP 플랫폼 호환성 문제 해결**: @esbuild/linux-x64를 dependencies에서 제거
+  - 근본 원인: Linux 전용 바이너리 패키지(@esbuild/linux-x64)가 모든 환경에서 필수로 설정됨
+  - 문제: Windows 시스템에서 설치 시 npm EBADPLATFORM 에러 발생
+  - 영향: Windows 기반 IDE(VS Code, Cursor, Copilot)에서 MCP 서버 초기화 실패
+  - 해결: 플랫폼별 의존성 제거, esbuild가 플랫폼 감지를 자동 처리하도록 개선
+  - 결과: Windows 및 Linux 환경에서 npm install 정상 작동
+  - 검증: 빌드 성공(tsc), 314개 패키지 감사, 취약점 0개
+
 ## [0.1.14] - 2025-11-13
 
 ### Added

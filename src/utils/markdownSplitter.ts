@@ -1,4 +1,4 @@
-import { markdownToTelegramHTML } from '../tools/markdownToTelegram';
+import { markdownToTelegramHTML } from '../tools/markdownToTelegram.js';
 
 /**
  * Markdown Splitter Utility

@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.16] - 2025-11-13
+
+### Fixed
+- **ESM module import path issue**: Added .js extension to relative imports for proper module resolution
+  - Problem: markdownSplitter.ts was importing markdownToTelegram without .js extension
+  - Root cause: ESM (ECMAScript Module) requires explicit .js extension for relative imports
+  - Impact: ERR_MODULE_NOT_FOUND when running in Node.js ESM environment (npm/npx)
+  - Solution: Changed '../tools/markdownToTelegram' to '../tools/markdownToTelegram.js'
+  - Verification: Build successful, markdown message test passed
+
+### 수정됨
+- **ESM 모듈 import 경로 문제 해결**: 상대 경로 import에 .js 확장자 추가
+  - 문제: markdownSplitter.ts가 markdownToTelegram을 .js 확장자 없이 import
+  - 근본 원인: ESM(ECMAScript Module)은 상대 경로 import 시 .js 확장자 명시 필수
+  - 영향: Node.js ESM 환경(npm/npx)에서 실행 시 ERR_MODULE_NOT_FOUND 에러
+  - 해결: '../tools/markdownToTelegram' → '../tools/markdownToTelegram.js' 수정
+  - 검증: 빌드 성공, 마크다운 메시지 테스트 통과
+
 ## [0.1.15] - 2025-11-13
 
 ### Fixed
